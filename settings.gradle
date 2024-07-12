@@ -11,6 +11,6 @@ plugins {
 }
 
 rootProject.name = 'burger-map'
-include 'module-api'
-include 'module-core'
+include 'api'
+include 'core'
 
