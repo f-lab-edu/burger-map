@@ -13,4 +13,3 @@ plugins {
 rootProject.name = 'burger-map'
 include 'api'
 include 'core'
-
