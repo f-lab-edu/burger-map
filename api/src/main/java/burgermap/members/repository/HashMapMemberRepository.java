@@ -41,7 +41,34 @@ public class HashMapMemberRepository implements MemberRepository{
         return new ArrayList<>(repository.values());
     }
 
+    /**
+     * 회원 삭제
+     */
+    @Override
+    public Member deleteMember(Long memberId) {
+        Member removedMember = repository.remove(memberId);
+        return removedMember;
+    }
+
+    /**
+     * 로그인 아이디 중복 확인
+     */
+    public boolean checkLoginIdDuplication(String loginId) {
+        return repository.values()
+                .stream()
+                .anyMatch(member -> member.getLoginId().equals(loginId));
+    }
+
+    /**
+     * 모든 회원 삭제
+     */
+    @Override
     public void clear() {
         repository.clear();
+        memberIdCount = 0L;
+    }
+
+    public void printAllMembers() {
+        repository.forEach((k, v) -> System.out.println(v));
     }
 }

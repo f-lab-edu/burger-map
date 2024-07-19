@@ -10,4 +10,8 @@ public interface MemberRepository {
     public Member findMember(Long memberId);
 
     public List<Member> findAllMembers();
+
+    public Member deleteMember(Long memberId);
+
+    public void clear();
 }
