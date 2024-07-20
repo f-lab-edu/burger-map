@@ -4,14 +4,12 @@ import burgermap.members.dto.MemberJoinDto;
 import burgermap.members.dto.MemberMapper;
 import burgermap.members.dto.MemberResponseDto;
 import burgermap.members.repository.MemberRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -20,15 +18,12 @@ import java.io.IOException;
 public class MemberController {
 
     private final MemberRepository repository;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * 회원 추가
      */
     @PostMapping
-    public MemberResponseDto addMember(@RequestBody String messageBody) throws IOException {
-        MemberJoinDto memberJoinDto = objectMapper.readValue(messageBody, MemberJoinDto.class);
-
+    public MemberResponseDto addMember(@RequestBody MemberJoinDto memberJoinDto) {
         // 검증 로직
 
         // 회원 가입용 DTO -> entity
