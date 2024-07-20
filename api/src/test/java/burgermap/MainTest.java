@@ -2,6 +2,7 @@ package burgermap;
 
 import burgermap.members.dto.MemberJoinDto;
 import burgermap.members.dto.MemberResponseDto;
+import burgermap.members.repository.MemberRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.*;
@@ -21,13 +22,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class MainTest {
 
     private ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    MemberRepository memberRepository;
 
     @Autowired
     MockMvc mvc;
 
     @AfterEach
     void afterEach() throws Exception {
-        mvc.perform((delete("/members")));  // HashMapRepository 초기화
+        memberRepository.clear();  // HashMapRepository 초기화
     }
 
     MemberJoinDto addTestMember() throws Exception {

@@ -76,13 +76,4 @@ public class MemberController {
             log.info("member deleted = {}", deletedMember);
         }
     }
-
-    /**
-     * 모든 회원 삭제
-     */
-    @DeleteMapping
-    public void deleteAllMembers() {
-        repository.clear();
-    }
-
 }
