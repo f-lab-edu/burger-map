@@ -1,15 +1,13 @@
 package burgermap.members;
 
-import burgermap.members.dto.MemberJoinDTO;
+import burgermap.members.dto.MemberJoinDto;
 import burgermap.members.dto.MemberMapper;
-import burgermap.members.dto.MemberResponseDTO;
-import burgermap.members.repository.HashMapMemberRepository;
+import burgermap.members.dto.MemberResponseDto;
 import burgermap.members.repository.MemberRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,31 +26,31 @@ public class MemberController {
      * 회원 추가
      */
     @PostMapping
-    public MemberResponseDTO addMember(@RequestBody String messageBody) throws IOException {
-        MemberJoinDTO memberJoinDTO = objectMapper.readValue(messageBody, MemberJoinDTO.class);
+    public MemberResponseDto addMember(@RequestBody String messageBody) throws IOException {
+        MemberJoinDto memberJoinDto = objectMapper.readValue(messageBody, MemberJoinDto.class);
 
         // 검증 로직
 
         // 회원 가입용 DTO -> entity
         Member member = new Member();
-        MemberMapper.memberJoinDTO2Member(memberJoinDTO, member);
+        MemberMapper.memberJoinDto2Member(memberJoinDto, member);
 
         // 회원 추가
         repository.addMember(member);
         log.info("new member = {}", member);
 
         // entity -> 응답용 DTO
-        MemberResponseDTO memberResponseDTO = new MemberResponseDTO();
-        MemberMapper.member2MemberResponseDTO(member, memberResponseDTO);
+        MemberResponseDto memberResponseDto = new MemberResponseDto();
+        MemberMapper.member2MemberResponseDto(member, memberResponseDto);
 
-        return memberResponseDTO;
+        return memberResponseDto;
     }
 
     /**
      * 회원 식별 번호를 통한 회원 조회
      */
     @GetMapping("/{memberId}")
-    public MemberResponseDTO findMemberByMemberID(@PathVariable("memberId") Long memberId, HttpServletResponse response) {
+    public MemberResponseDto findMemberByMemberID(@PathVariable("memberId") Long memberId, HttpServletResponse response) {
         Member member = repository.findMember(memberId);
 
         if (member == null) {  // 해당 식별 번호를 가진 회원이 없는 경우
@@ -62,10 +60,10 @@ public class MemberController {
         }
 
         log.info("found member = {}", member);
-        MemberResponseDTO memberResponseDTO = new MemberResponseDTO();
-        MemberMapper.member2MemberResponseDTO(member, memberResponseDTO);
+        MemberResponseDto memberResponseDto = new MemberResponseDto();
+        MemberMapper.member2MemberResponseDto(member, memberResponseDto);
 
-        return memberResponseDTO;
+        return memberResponseDto;
     }
 
     /**

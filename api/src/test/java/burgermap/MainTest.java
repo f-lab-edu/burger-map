@@ -1,8 +1,7 @@
 package burgermap;
 
-import burgermap.members.dto.MemberJoinDTO;
-import burgermap.members.dto.MemberResponseDTO;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import burgermap.members.dto.MemberJoinDto;
+import burgermap.members.dto.MemberResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.*;
@@ -13,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,14 +30,14 @@ class MainTest {
         mvc.perform((delete("/members")));  // HashMapRepository 초기화
     }
 
-    MemberJoinDTO addTestMember() throws Exception {
-        MemberJoinDTO memberJoinDTO = new MemberJoinDTO();
-        memberJoinDTO.setLoginId("testId");
-        memberJoinDTO.setEmail("test@gmail.com");
-        memberJoinDTO.setPassword("testPw");
+    MemberJoinDto addTestMember() throws Exception {
+        MemberJoinDto memberJoinDto = new MemberJoinDto();
+        memberJoinDto.setLoginId("testId");
+        memberJoinDto.setEmail("test@gmail.com");
+        memberJoinDto.setPassword("testPw");
 
         // when
-        String reqMessageBody = objectMapper.writeValueAsString(memberJoinDTO);
+        String reqMessageBody = objectMapper.writeValueAsString(memberJoinDto);
 
         // then
         mvc.perform(post("/members")
@@ -47,25 +45,25 @@ class MainTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        return memberJoinDTO;
+        return memberJoinDto;
     }
 
     @Test
     @DisplayName("회원 추가")
     void addMemberTest() throws Exception {
         // given
-        MemberJoinDTO memberJoinDTO = new MemberJoinDTO();
-        memberJoinDTO.setLoginId("testId");
-        memberJoinDTO.setEmail("test@gmail.com");
-        memberJoinDTO.setPassword("testPw");
+        MemberJoinDto memberJoinDto = new MemberJoinDto();
+        memberJoinDto.setLoginId("testId");
+        memberJoinDto.setEmail("test@gmail.com");
+        memberJoinDto.setPassword("testPw");
 
-        MemberResponseDTO memberResponseDTO = new MemberResponseDTO();
-        memberResponseDTO.setLoginId(memberJoinDTO.getLoginId());
-        memberResponseDTO.setEmail(memberJoinDTO.getEmail());
+        MemberResponseDto memberResponseDto = new MemberResponseDto();
+        memberResponseDto.setLoginId(memberJoinDto.getLoginId());
+        memberResponseDto.setEmail(memberJoinDto.getEmail());
 
         // when
-        String reqMessageBody = objectMapper.writeValueAsString(memberJoinDTO);
-        String respMessageBody = objectMapper.writeValueAsString(memberResponseDTO);
+        String reqMessageBody = objectMapper.writeValueAsString(memberJoinDto);
+        String respMessageBody = objectMapper.writeValueAsString(memberResponseDto);
 
         // then
         mvc.perform(post("/members")
@@ -80,13 +78,13 @@ class MainTest {
     void findMemberByMemberIdTest() throws Exception {
         // given
         // 회원 등록
-        MemberJoinDTO memberJoinDTO = addTestMember();
+        MemberJoinDto memberJoinDto = addTestMember();
 
         // when
-        MemberResponseDTO memberResponseDTO = new MemberResponseDTO();
-        memberResponseDTO.setLoginId(memberJoinDTO.getLoginId());
-        memberResponseDTO.setEmail(memberJoinDTO.getEmail());
-        String respMessageBody = objectMapper.writeValueAsString(memberResponseDTO);
+        MemberResponseDto memberResponseDto = new MemberResponseDto();
+        memberResponseDto.setLoginId(memberJoinDto.getLoginId());
+        memberResponseDto.setEmail(memberJoinDto.getEmail());
+        String respMessageBody = objectMapper.writeValueAsString(memberResponseDto);
 
         // then
         // 회원 조회
