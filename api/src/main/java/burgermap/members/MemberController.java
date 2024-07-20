@@ -21,8 +21,7 @@ import java.io.IOException;
 @RequestMapping("members")
 public class MemberController {
 
-//    private final MemberRepository repository;
-    private final HashMapMemberRepository repository;
+    private final MemberRepository repository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -54,7 +53,6 @@ public class MemberController {
      */
     @GetMapping("/{memberId}")
     public MemberResponseDTO findMemberByMemberID(@PathVariable("memberId") Long memberId, HttpServletResponse response) {
-        repository.printAllMembers();
         Member member = repository.findMember(memberId);
 
         if (member == null) {  // 해당 식별 번호를 가진 회원이 없는 경우
