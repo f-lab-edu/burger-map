@@ -1,6 +1,6 @@
-package burgermap.members.repository;
+package burgermap.repository;
 
-import burgermap.members.Member;
+import burgermap.entity.Member;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;

@@ -1,8 +1,8 @@
-package burgermap;
+package burgermap.controller;
 
-import burgermap.members.dto.MemberJoinDto;
-import burgermap.members.dto.MemberResponseDto;
-import burgermap.members.repository.MemberRepository;
+import burgermap.dto.member.MemberJoinDto;
+import burgermap.dto.member.MemberResponseDto;
+import burgermap.repository.MemberRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.*;

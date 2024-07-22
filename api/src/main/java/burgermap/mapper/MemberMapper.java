@@ -1,6 +1,8 @@
-package burgermap.members.dto;
+package burgermap.mapper;
 
-import burgermap.members.Member;
+import burgermap.dto.member.MemberJoinDto;
+import burgermap.dto.member.MemberResponseDto;
+import burgermap.entity.Member;
 
 public class MemberMapper {
 

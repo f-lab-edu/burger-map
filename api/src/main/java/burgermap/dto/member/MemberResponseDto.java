@@ -1,4 +1,4 @@
-package burgermap.members.dto;
+package burgermap.dto.member;
 
 import lombok.Getter;
 import lombok.Setter;

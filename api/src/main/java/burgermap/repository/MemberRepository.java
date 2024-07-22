@@ -1,6 +1,6 @@
-package burgermap.members.repository;
+package burgermap.repository;
 
-import burgermap.members.Member;
+import burgermap.entity.Member;
 
 import java.util.List;
 

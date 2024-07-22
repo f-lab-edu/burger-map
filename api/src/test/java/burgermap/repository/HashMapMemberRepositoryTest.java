@@ -1,6 +1,7 @@
-package burgermap.members.repository;
+package burgermap.repository;
 
-import burgermap.members.Member;
+import burgermap.entity.Member;
+import burgermap.repository.HashMapMemberRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

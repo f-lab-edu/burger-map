@@ -1,4 +1,4 @@
-package burgermap.members;
+package burgermap.entity;
 
 import lombok.*;
 

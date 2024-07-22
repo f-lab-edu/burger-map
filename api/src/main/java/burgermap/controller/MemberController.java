@@ -1,9 +1,10 @@
-package burgermap.members;
+package burgermap.controller;
 
-import burgermap.members.dto.MemberJoinDto;
-import burgermap.members.dto.MemberMapper;
-import burgermap.members.dto.MemberResponseDto;
-import burgermap.members.repository.MemberRepository;
+import burgermap.entity.Member;
+import burgermap.dto.member.MemberJoinDto;
+import burgermap.mapper.MemberMapper;
+import burgermap.dto.member.MemberResponseDto;
+import burgermap.repository.MemberRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
