@@ -66,15 +66,19 @@ public class MemberController {
      * 회원 식별 번호를 통한 회원 삭제
      */
     @DeleteMapping("/{memberId}")
-    public void deleteMember(@PathVariable("memberId") Long memberId, HttpServletResponse response) {
+    public MemberResponseDto deleteMember(@PathVariable("memberId") Long memberId, HttpServletResponse response) {
         Member member = repository.findMember(memberId);
 
         if (member == null) {
             log.info("member(memberId = {}) not found", memberId);
             response.setStatus(HttpStatus.NOT_FOUND.value());
+            return null;
         } else {
             Member deletedMember = repository.deleteMember(memberId);
             log.info("member deleted = {}", deletedMember);
+            MemberResponseDto memberResponseDto = new MemberResponseDto();
+            MemberMapper.member2MemberResponseDto(deletedMember, memberResponseDto);
+            return memberResponseDto;
         }
     }
 }
