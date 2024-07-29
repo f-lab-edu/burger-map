@@ -12,10 +12,9 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MemberServiceImpl implements MemberService {
+public class MemberServiceImpl {
 
     private final MemberRepository repository;
-    @Override
     public MemberResponseDto addMember(MemberJoinDto memberJoinDto) {
         // 검증 로직
 
@@ -34,7 +33,6 @@ public class MemberServiceImpl implements MemberService {
         return memberResponseDto;
     }
 
-    @Override
     public MemberResponseDto findMemberByMemberId(Long memberId) {
         Member member = repository.findMember(memberId);
         if (member == null) {  // 해당 식별 번호를 가진 회원이 없는 경우
@@ -48,7 +46,6 @@ public class MemberServiceImpl implements MemberService {
         return memberResponseDto;
     }
 
-    @Override
     public MemberResponseDto deleteMember(Long memberId) {
         Member member = repository.findMember(memberId);
         if (member == null) {  // 해당 식별 번호를 가진 회원이 없는 경우
