@@ -49,4 +49,39 @@ class HashMapMemberRepositoryTest {
         // then
         assertThat(unregisteredMember).isNull();
     }
+
+    @Test
+    @DisplayName("회원 삭제")
+    void deleteMember() {
+        // given
+        Member member1 = new Member(1L, "testId1", "test1", "test1@gmail.com");
+        Member member2 = new Member(2L, "testId2", "test2", "test2@gmail.com");
+        repository.addMember(member1);
+        repository.addMember(member2);
+
+        // when - 회원을 삭제하고 조회
+        Long deleteTargetMemberId = member2.getMemberId();
+        Member deletedMember = repository.deleteMember(deleteTargetMemberId);
+        Member foundDeletedMember = repository.findMember(deleteTargetMemberId);
+
+        // then
+        assertThat(deletedMember).isEqualTo(member2);
+        assertThat(foundDeletedMember).isNull();
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원 삭제")
+    void deleteUnregisteredMember() {
+        // given
+        Member member1 = new Member(1L, "testId1", "test1", "test1@gmail.com");
+        Member member2 = new Member(2L, "testId2", "test2", "test2@gmail.com");
+        repository.addMember(member1);
+        repository.addMember(member2);
+
+        // when
+        Member deletedMember = repository.deleteMember(-1L);
+
+        // then
+        assertThat(deletedMember).isNull();
+    }
 }
