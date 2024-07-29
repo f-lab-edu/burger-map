@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class HashMapMemberRepository implements MemberRepository{
 
-    private final Map<Long, Member> repository = new HashMap<>();
-    private long memberIdCount = 0L;
+    private final Map<Long, Member> repository = new ConcurrentHashMap<>();
+    private AtomicLong memberIdCount = new AtomicLong(0);
 
     /**
      * 회원 등록
@@ -20,8 +22,8 @@ public class HashMapMemberRepository implements MemberRepository{
      */
     @Override
     public Member addMember(Member member) {
-        member.setMemberId(++memberIdCount);
-        repository.put(memberIdCount, member);
+        member.setMemberId(memberIdCount.incrementAndGet());
+        repository.put(memberIdCount.get(), member);
         return member;
     }
 
@@ -65,7 +67,7 @@ public class HashMapMemberRepository implements MemberRepository{
     @Override
     public void clear() {
         repository.clear();
-        memberIdCount = 0L;
+        memberIdCount.set(0);
     }
 
     public void printAllMembers() {
