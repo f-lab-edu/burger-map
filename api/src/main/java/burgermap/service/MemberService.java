@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MemberServiceImpl {
+public class MemberService {
 
     private final MemberRepository repository;
     public MemberResponseDto addMember(MemberJoinDto memberJoinDto) {

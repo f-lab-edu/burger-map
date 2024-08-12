@@ -4,7 +4,6 @@ import burgermap.dto.member.MemberJoinDto;
 import burgermap.dto.member.MemberResponseDto;
 import burgermap.entity.Member;
 import burgermap.repository.HashMapMemberRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,10 +16,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-class MemberServiceImplTest {
+class MemberServiceTest {
 
     @InjectMocks
-    MemberServiceImpl memberService;
+    MemberService memberService;
 
     @Mock
     HashMapMemberRepository memberRepository;
