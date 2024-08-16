@@ -2,36 +2,29 @@ package burgermap.controller;
 
 import burgermap.dto.member.MemberJoinDto;
 import burgermap.dto.member.MemberResponseDto;
-import burgermap.repository.MemberRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.*;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class MemberControllerTest {
 
+    @LocalServerPort
+    private int port;
+
     private ObjectMapper objectMapper = new ObjectMapper();
-    @Autowired
-    MemberRepository memberRepository;
 
     @Autowired
-    MockMvc mvc;
+    private TestRestTemplate restTemplate;
 
-    @AfterEach
-    void afterEach() throws Exception {
-        memberRepository.clear();  // HashMapRepository 초기화
-    }
+    private String urlForm = "http://localhost:%d%s";
 
     MemberJoinDto addTestMember() throws Exception {
         MemberJoinDto memberJoinDto = new MemberJoinDto();
@@ -39,14 +32,8 @@ class MemberControllerTest {
         memberJoinDto.setEmail("test@gmail.com");
         memberJoinDto.setPassword("testPw");
 
-        // when
-        String reqMessageBody = objectMapper.writeValueAsString(memberJoinDto);
-
-        // then
-        mvc.perform(post("/members")
-                .content(reqMessageBody)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        // add 1 member
+        restTemplate.postForObject(urlForm.formatted(port, "/members"), memberJoinDto, MemberResponseDto.class);
 
         return memberJoinDto;
     }
@@ -65,15 +52,11 @@ class MemberControllerTest {
         memberResponseDto.setEmail(memberJoinDto.getEmail());
 
         // when
-        String reqMessageBody = objectMapper.writeValueAsString(memberJoinDto);
-        String respMessageBody = objectMapper.writeValueAsString(memberResponseDto);
+        MemberResponseDto memberResponseDtoResult = restTemplate.postForObject(
+                urlForm.formatted(port, "/members"), memberJoinDto, MemberResponseDto.class);
 
         // then
-        mvc.perform(post("/members")
-                .content(reqMessageBody)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString(respMessageBody)));
+        assertThat(memberResponseDtoResult).isEqualTo(memberResponseDto);
     }
 
     @Test
@@ -87,24 +70,27 @@ class MemberControllerTest {
         MemberResponseDto memberResponseDto = new MemberResponseDto();
         memberResponseDto.setLoginId(memberJoinDto.getLoginId());
         memberResponseDto.setEmail(memberJoinDto.getEmail());
-        String respMessageBody = objectMapper.writeValueAsString(memberResponseDto);
+
+        MemberResponseDto memberResponseDtoResult = restTemplate.getForObject(
+                urlForm.formatted(port, "/members/1"), MemberResponseDto.class);
 
         // then
-        // 회원 조회
-        mvc.perform(get("/members/1"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString(respMessageBody)));
+        assertThat(memberResponseDtoResult).isEqualTo(memberResponseDto);
     }
 
     @Test
+//    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     @DisplayName("존재하지 않는 회원 조회")
     void findUnregisteredMemberTest() throws Exception {
         // given
-        Long unregisteredMemberId = 1L;
+        Long unregisteredMemberId = -1L;
 
         // when
+        ResponseEntity<MemberResponseDto> responseEntity= restTemplate.getForEntity(
+                urlForm.formatted(port, "/members/" + unregisteredMemberId), MemberResponseDto.class);
+
         // then
-        mvc.perform(get("/members/" + unregisteredMemberId)).andExpect(status().isNotFound());
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
@@ -112,18 +98,25 @@ class MemberControllerTest {
     void deleteMemberTest() throws Exception {
         // given
         addTestMember();
+        Long deletedMemberId = 1L;
 
         // when
+        ResponseEntity<Void> responseEntity = restTemplate.exchange(
+                urlForm.formatted(port, "/members/" + deletedMemberId), HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+
         // then
-        mvc.perform(delete("/members/1")).andExpect(status().isOk());
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
     @DisplayName("존재하지 않는 회원 삭제")
     void deleteUnregisteredMemberTest() throws Exception {
         // given
+        Long unregisteredMemberId = -1L;
         // when
         // then
-        mvc.perform(delete("/members/1")).andExpect(status().isNotFound());
+        ResponseEntity<Void> responseEntity = restTemplate.exchange(
+                urlForm.formatted(port, "/members/" + unregisteredMemberId), HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 }

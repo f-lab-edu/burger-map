@@ -1,10 +1,8 @@
 package burgermap.controller;
 
-import burgermap.entity.Member;
 import burgermap.dto.member.MemberJoinDto;
-import burgermap.mapper.MemberMapper;
 import burgermap.dto.member.MemberResponseDto;
-import burgermap.repository.MemberRepository;
+import burgermap.service.MemberServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,28 +16,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("members")
 public class MemberController {
 
-    private final MemberRepository repository;
+    private final MemberServiceImpl memberService;
 
     /**
      * 회원 추가
      */
     @PostMapping
     public MemberResponseDto addMember(@RequestBody MemberJoinDto memberJoinDto) {
-        // 검증 로직
-
-        // 회원 가입용 DTO -> entity
-        Member member = new Member();
-        MemberMapper.memberJoinDto2Member(memberJoinDto, member);
-
-        // 회원 추가
-        repository.addMember(member);
-        log.info("new member = {}", member);
-
-        // entity -> 응답용 DTO
-        MemberResponseDto memberResponseDto = new MemberResponseDto();
-        MemberMapper.member2MemberResponseDto(member, memberResponseDto);
-
-        return memberResponseDto;
+        return memberService.addMember(memberJoinDto);
     }
 
     /**
@@ -47,34 +31,22 @@ public class MemberController {
      */
     @GetMapping("/{memberId}")
     public MemberResponseDto findMemberByMemberID(@PathVariable("memberId") Long memberId, HttpServletResponse response) {
-        Member member = repository.findMember(memberId);
-
-        if (member == null) {  // 해당 식별 번호를 가진 회원이 없는 경우
-            log.info("member(memberId = {}) not found", memberId);
+        MemberResponseDto foundMemberDto = memberService.findMemberByMemberId(memberId);
+        if (foundMemberDto == null) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
-            return null;
         }
-
-        log.info("found member = {}", member);
-        MemberResponseDto memberResponseDto = new MemberResponseDto();
-        MemberMapper.member2MemberResponseDto(member, memberResponseDto);
-
-        return memberResponseDto;
+        return foundMemberDto;
     }
 
     /**
      * 회원 식별 번호를 통한 회원 삭제
      */
     @DeleteMapping("/{memberId}")
-    public void deleteMember(@PathVariable("memberId") Long memberId, HttpServletResponse response) {
-        Member member = repository.findMember(memberId);
-
-        if (member == null) {
-            log.info("member(memberId = {}) not found", memberId);
+    public MemberResponseDto deleteMember(@PathVariable("memberId") Long memberId, HttpServletResponse response) {
+        MemberResponseDto deletedMember = memberService.deleteMember(memberId);
+        if (deletedMember == null) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
-        } else {
-            Member deletedMember = repository.deleteMember(memberId);
-            log.info("member deleted = {}", deletedMember);
         }
+        return deletedMember;
     }
 }
