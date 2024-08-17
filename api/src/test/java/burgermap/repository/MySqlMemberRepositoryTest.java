@@ -2,7 +2,6 @@ package burgermap.repository;
 
 
 import burgermap.entity.Member;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,18 +16,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
-public class MemberRepositoryTest {
+public class MySqlMemberRepositoryTest {
 
     @Autowired
-    MemberRepository memberRepository;
-
-    @BeforeEach
-    void beforeEach() {
-        // transaction을 사용하지 않는 메모리 DB를 직접 초기화
-        if (memberRepository instanceof HashMapMemberRepository) {
-            memberRepository.clear();
-        }
-    }
+    MySqlMemberRepository memberRepository;
 
     /**
      * 테스트용 회원 데이터 추가
