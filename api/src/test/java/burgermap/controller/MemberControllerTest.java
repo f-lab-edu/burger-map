@@ -1,5 +1,6 @@
 package burgermap.controller;
 
+import burgermap.TestcontainersMySqlTest;
 import burgermap.dto.member.MemberJoinDto;
 import burgermap.dto.member.MemberResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class MemberControllerTest {
+class MemberControllerTest extends TestcontainersMySqlTest {
 
     @LocalServerPort
     private int port;

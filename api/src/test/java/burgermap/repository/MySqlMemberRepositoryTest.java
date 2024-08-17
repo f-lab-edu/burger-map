@@ -1,6 +1,7 @@
 package burgermap.repository;
 
 
+import burgermap.TestcontainersMySqlTest;
 import burgermap.entity.Member;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
-public class MySqlMemberRepositoryTest {
+public class MySqlMemberRepositoryTest extends TestcontainersMySqlTest {
 
     @Autowired
     MySqlMemberRepository memberRepository;
