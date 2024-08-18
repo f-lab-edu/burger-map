@@ -10,3 +10,9 @@ dependencies {
     testImplementation "org.testcontainers:junit-jupiter:1.20.1"
     testImplementation "org.testcontainers:mysql:1.20.1"
 }
+
+test {
+    beforeTest { descriptor ->
+        logger.lifecycle("Running test: ${descriptor}")
+    }
+}
