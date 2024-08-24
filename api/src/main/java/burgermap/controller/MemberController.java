@@ -6,14 +6,21 @@ import burgermap.service.MemberService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Slf4j
@@ -28,7 +35,7 @@ public class MemberController {
      * 회원 추가
      */
     @PostMapping
-    public MemberResponseDto addMember(@RequestBody MemberJoinDto memberJoinDto) {
+    public MemberResponseDto addMember(@RequestBody @Validated MemberJoinDto memberJoinDto) {
         return memberService.addMember(memberJoinDto);
     }
 
