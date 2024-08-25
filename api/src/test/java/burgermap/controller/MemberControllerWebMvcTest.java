@@ -2,6 +2,7 @@ package burgermap.controller;
 
 import burgermap.dto.member.MemberJoinDto;
 import burgermap.dto.member.MemberResponseDto;
+import burgermap.dto.member.MemberUpdateDto;
 import burgermap.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -220,5 +222,115 @@ public class MemberControllerWebMvcTest {
         // when & then
         mockMvc.perform(delete("/members/" + nonExistMemberId))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("회원 정보 수정")
+    void updateMemberTest() throws Exception {
+        // given
+        long existMemberId = 1L;
+
+        MemberUpdateDto memberUpdateDto = new MemberUpdateDto();
+        memberUpdateDto.setPassword(validPw);
+        memberUpdateDto.setEmail(validEmail);
+        String updateInfo = objectMapper.writeValueAsString(memberUpdateDto);
+
+        MemberResponseDto expectedMemberResponseDto = new MemberResponseDto();
+        expectedMemberResponseDto.setLoginId(validId);
+        expectedMemberResponseDto.setEmail(validEmail);
+
+        given(memberService.updateMember(any(Long.class), any(MemberUpdateDto.class))).willReturn(expectedMemberResponseDto);
+
+        // when
+        MockHttpServletResponse response = mockMvc.perform(patch("/members/" + existMemberId)
+                .content(updateInfo)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
+        MemberResponseDto updatedMember = objectMapper.readValue(response.getContentAsString(), MemberResponseDto.class);
+
+        // then
+        assertThat(updatedMember).isEqualTo(expectedMemberResponseDto);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원 정보 수정")
+    void updateUnregisteredMemberTest() throws Exception {
+        // given
+        long NonExistMemberId = -1L;
+
+        MemberUpdateDto memberUpdateDto = new MemberUpdateDto();
+        memberUpdateDto.setPassword(validPw);
+        memberUpdateDto.setEmail(validEmail);
+        String updateInfo = objectMapper.writeValueAsString(memberUpdateDto);
+
+        // when & then
+        mockMvc.perform(patch("/members/" + NonExistMemberId)
+                        .content(updateInfo)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("제약조건을 어기는 값으로 회원 정보 수정")
+    void updateMemberWithNonValidInfo() throws Exception {
+        // given
+        long existMemberId = 1L;
+
+        // Non-Valid case
+        String shortPw = "shortPw";
+        String longPw = "tooLoooooongPw";
+        String wrongEmail = "nonValidEmail@";
+
+        // given - 제약조건보다 짧은 password
+        MemberUpdateDto memberUpdateDtoShortPw = new MemberUpdateDto();
+        memberUpdateDtoShortPw.setPassword(shortPw);
+
+        String updateInfoShortPw = objectMapper.writeValueAsString(memberUpdateDtoShortPw);
+
+        // when & then
+        mockMvc.perform(patch("/members/" + existMemberId)
+                        .content(updateInfoShortPw)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[*].fieldName", hasItems("password")));
+
+        // given - 제약조건보다 긴 password
+        MemberUpdateDto memberUpdateDtoLongPw = new MemberUpdateDto();
+        memberUpdateDtoLongPw.setPassword(longPw);
+
+        String updateInfoLongPw = objectMapper.writeValueAsString(memberUpdateDtoLongPw);
+
+        // when & then
+        mockMvc.perform(patch("/members/" + existMemberId)
+                        .content(updateInfoLongPw)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[*].fieldName", hasItems("password")));
+
+        // given - 잘못된 이메일 형식
+        MemberUpdateDto memberUpdateDtoWrongEmail = new MemberUpdateDto();
+        memberUpdateDtoWrongEmail.setEmail(wrongEmail);
+
+        String updateInfoWrongEmail = objectMapper.writeValueAsString(memberUpdateDtoWrongEmail);
+
+        // when & then
+        mockMvc.perform(patch("/members/" + existMemberId)
+                        .content(updateInfoWrongEmail)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[*].fieldName", hasItems("email")));
+
+        // given - password, email 모두 null
+        MemberUpdateDto memberUpdateDtoAllNull = new MemberUpdateDto();
+
+        String updateInfoAllNull = objectMapper.writeValueAsString(memberUpdateDtoAllNull);
+
+        // when & then
+        mockMvc.perform(patch("/members/" + existMemberId)
+                        .content(updateInfoAllNull)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[*].objectError", hasItems("allFieldsNull")));
     }
 }

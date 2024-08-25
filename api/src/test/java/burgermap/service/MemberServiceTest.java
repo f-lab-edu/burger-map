@@ -2,8 +2,9 @@ package burgermap.service;
 
 import burgermap.dto.member.MemberJoinDto;
 import burgermap.dto.member.MemberResponseDto;
+import burgermap.dto.member.MemberUpdateDto;
 import burgermap.entity.Member;
-import burgermap.repository.HashMapMemberRepository;
+import burgermap.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +23,7 @@ class MemberServiceTest {
     MemberService memberService;
 
     @Mock
-    HashMapMemberRepository memberRepository;
+    MemberRepository memberRepository;
 
     @Test
     @DisplayName("회원 추가")
@@ -111,5 +112,53 @@ class MemberServiceTest {
 
         // then
         assertThat(memberResponseDto).isNull();
+    }
+
+    @Test
+    @DisplayName("회원 정보 수정")
+    void updateMemberTest() {
+        // memberId와 MemberUpdateDto 객체를 받아 repository의 updateMember 메서드 호출,
+        // 반환받은 Member 객체를 MemberResponseDto 객체로 변환하여 반환
+
+        // given
+        long memberId = 1L;
+        MemberUpdateDto memberUpdateDto = new MemberUpdateDto();
+        memberUpdateDto.setPassword("newPassword");
+        memberUpdateDto.setEmail("newMail@gmail.com");
+
+        Member member = new Member();
+        member.setMemberId(memberId);
+        member.setLoginId("testId001");
+        member.setPassword(memberUpdateDto.getPassword());
+        member.setEmail(memberUpdateDto.getEmail());
+
+        MemberResponseDto expectedMemberResponseDto = new MemberResponseDto();
+        expectedMemberResponseDto.setEmail(memberUpdateDto.getEmail());
+        expectedMemberResponseDto.setLoginId(member.getLoginId());
+
+        given(memberRepository.updateMember(memberId, memberUpdateDto)).willReturn(member);
+
+        // when
+        MemberResponseDto memberResponseDto = memberService.updateMember(memberId, memberUpdateDto);
+
+        // then
+        assertThat(memberResponseDto).isEqualTo(expectedMemberResponseDto);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원 정보 수정")
+    void updateUnregisteredMemberTest() {
+        // given
+        MemberUpdateDto memberUpdateDto = new MemberUpdateDto();
+        memberUpdateDto.setPassword("newPassword");
+        memberUpdateDto.setEmail("newMail@gmail.com");
+        given(memberRepository.updateMember(any(Long.class), any(MemberUpdateDto.class))).willReturn(null);
+
+        // when
+        MemberResponseDto memberResponseDto = memberService.updateMember(-1L, memberUpdateDto);
+
+        // then
+        assertThat(memberResponseDto).isNull();
+
     }
 }

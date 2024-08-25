@@ -30,11 +30,15 @@ class MemberControllerTest extends TestcontainersMySqlTest {
 
     private String urlForm = "http://localhost:%d%s";
 
+    private String validId = "length10Id";
+    private String validPw = "length10Pw";
+    private String validEmail = "id@gmail.com";
+
     MemberJoinDto addTestMember() throws Exception {
         MemberJoinDto memberJoinDto = new MemberJoinDto();
-        memberJoinDto.setLoginId("testId");
-        memberJoinDto.setEmail("test@gmail.com");
-        memberJoinDto.setPassword("testPw");
+        memberJoinDto.setLoginId(validId);
+        memberJoinDto.setEmail(validEmail);
+        memberJoinDto.setPassword(validPw);
 
         // add 1 member
         restTemplate.postForObject(urlForm.formatted(port, "/members"), memberJoinDto, MemberResponseDto.class);
@@ -47,9 +51,9 @@ class MemberControllerTest extends TestcontainersMySqlTest {
     void addMemberTest() throws Exception {
         // given
         MemberJoinDto memberJoinDto = new MemberJoinDto();
-        memberJoinDto.setLoginId("testId");
-        memberJoinDto.setEmail("test@gmail.com");
-        memberJoinDto.setPassword("testPw");
+        memberJoinDto.setLoginId(validId);
+        memberJoinDto.setEmail(validEmail);
+        memberJoinDto.setPassword(validPw);
 
         MemberResponseDto memberResponseDto = new MemberResponseDto();
         memberResponseDto.setLoginId(memberJoinDto.getLoginId());

@@ -2,6 +2,7 @@ package burgermap.repository;
 
 
 import burgermap.TestcontainersMySqlTest;
+import burgermap.dto.member.MemberUpdateDto;
 import burgermap.entity.Member;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -141,5 +142,47 @@ public class MySqlMemberRepositoryTest extends TestcontainersMySqlTest {
         // then
         assertThat(notExistMember).isNull();
         assertThat(deletedMember).isNull();
+    }
+
+    @Test
+    @DisplayName("회원 정보 수정")
+    void updateMemberTest() {
+        // given
+        HashMap<Long, Member> memberHashMap = addNMembers(5);
+
+        long targetMemberId = memberHashMap.keySet().iterator().next();
+        String newPassword = "newPassword";
+        String newEmail = "newMail@gmail.com";
+        MemberUpdateDto memberUpdateDto = new MemberUpdateDto();
+        memberUpdateDto.setPassword(newPassword);
+        memberUpdateDto.setEmail(newEmail);
+
+        // when
+        memberRepository.updateMember(targetMemberId, memberUpdateDto);
+        Member updatedMember = memberRepository.findMember(targetMemberId);
+
+        // then
+        assertThat(updatedMember.getPassword()).isEqualTo(newPassword);
+        assertThat(updatedMember.getEmail()).isEqualTo(newEmail);
+    }
+
+    @Test
+    @DisplayName("미등록 회원 정보 수정")
+    void updateUnregisteredMemberTest() {
+        // given
+        HashMap<Long, Member> memberHashMap = addNMembers(5);
+        String newPassword = "newPassword";
+        String newEmail = "newMail@gmail.com";
+        MemberUpdateDto memberUpdateDto = new MemberUpdateDto();
+        memberUpdateDto.setPassword(newPassword);
+        memberUpdateDto.setEmail(newEmail);
+
+        // when
+        ArrayList<Long> ids = new ArrayList<>(memberHashMap.keySet());
+        long notExistId = ids.stream().mapToLong(l -> l).sum();
+        Member member = memberRepository.updateMember(notExistId, memberUpdateDto);
+
+        // then
+        assertThat(member).isNull();
     }
 }
