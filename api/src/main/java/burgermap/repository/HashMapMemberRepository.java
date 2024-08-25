@@ -1,5 +1,6 @@
 package burgermap.repository;
 
+import burgermap.dto.member.MemberUpdateDto;
 import burgermap.entity.Member;
 
 import java.util.ArrayList;
@@ -57,6 +58,21 @@ public class HashMapMemberRepository implements MemberRepository{
         return repository.values()
                 .stream()
                 .anyMatch(member -> member.getLoginId().equals(loginId));
+    }
+
+    @Override
+    public Member updateMember(Long memberId, MemberUpdateDto memberUpdateDto) {
+        Member member = findMember(memberId);
+        if (member != null) {
+            if (memberUpdateDto.getPassword() != null) {
+                member.setPassword(memberUpdateDto.getPassword());
+            }
+            if (memberUpdateDto.getEmail() != null) {
+                member.setEmail(memberUpdateDto.getEmail());
+            }
+        }
+
+        return member;
     }
 
     /**

@@ -2,12 +2,17 @@ package burgermap.service;
 
 import burgermap.dto.member.MemberJoinDto;
 import burgermap.dto.member.MemberResponseDto;
+import burgermap.dto.member.MemberUpdateDto;
 import burgermap.entity.Member;
 import burgermap.mapper.MemberMapper;
 import burgermap.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
+
+import java.lang.reflect.Field;
+import java.util.Arrays;
 
 @Slf4j
 @Service
@@ -58,5 +63,18 @@ public class MemberService {
             MemberMapper.member2MemberResponseDto(deletedMember, memberResponseDto);
             return memberResponseDto;
         }
+    }
+
+    public MemberResponseDto updateMember(Long memberId, MemberUpdateDto memberUpdateDto) {
+        Member member = repository.updateMember(memberId, memberUpdateDto);
+        if (member == null) {  // 해당 식별 번호를 가진 회원이 없는 경우
+            log.info("member(memberId = {}) not found", memberId);
+            return null;
+        }
+
+        MemberResponseDto memberResponseDto = new MemberResponseDto();
+        MemberMapper.member2MemberResponseDto(member, memberResponseDto);
+
+        return memberResponseDto;
     }
 }

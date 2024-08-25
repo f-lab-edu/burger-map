@@ -2,17 +2,23 @@ package burgermap.controller;
 
 import burgermap.dto.member.MemberJoinDto;
 import burgermap.dto.member.MemberResponseDto;
+import burgermap.dto.member.MemberUpdateDto;
 import burgermap.service.MemberService;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,5 +67,38 @@ public class MemberController {
             response.setStatus(HttpStatus.NOT_FOUND.value());
         }
         return deletedMember;
+    }
+
+    @PatchMapping("/{memberId}")
+    public ResponseEntity<MemberResponseDto> updateMember(
+            @PathVariable("memberId") Long memberId,
+            @RequestBody @Valid MemberUpdateDto memberUpdateDto,
+            BindingResult bindingResult
+            ) throws MethodArgumentNotValidException, NoSuchMethodException {
+        if (memberUpdateDto.getEmail() == null && memberUpdateDto.getPassword() == null) {
+            bindingResult.reject("allFieldsNull", "하나 이상의 필드를 입력해야합니다.");
+            throw new MethodArgumentNotValidException(
+                    new MethodParameter(
+                            this.getClass().getDeclaredMethod("updateMember", Long.class, MemberUpdateDto.class, BindingResult.class),
+                            0),
+                    bindingResult
+            );
+        }
+
+        if (bindingResult.hasErrors()) {
+            throw new MethodArgumentNotValidException(
+                    new MethodParameter(
+                            this.getClass().getDeclaredMethod("updateMember", Long.class, MemberUpdateDto.class, BindingResult.class),
+                            0),
+                    bindingResult
+            );
+        }
+
+        MemberResponseDto memberResponseDto = memberService.updateMember(memberId, memberUpdateDto);
+        if (memberResponseDto == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(memberResponseDto);
     }
 }

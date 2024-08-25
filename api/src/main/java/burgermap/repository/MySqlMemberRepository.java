@@ -1,5 +1,6 @@
 package burgermap.repository;
 
+import burgermap.dto.member.MemberUpdateDto;
 import burgermap.entity.Member;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,21 @@ public class MySqlMemberRepository implements MemberRepository {
         Member member = em.find(Member.class, memberId);
         if(member != null) {
             em.remove(member);
+        }
+        return member;
+    }
+
+    @Override
+    public Member updateMember(Long memberId, MemberUpdateDto memberUpdateDto) {
+        Member member = findMember(memberId);
+        if(member != null) {
+            if (memberUpdateDto.getPassword() != null) {
+                member.setPassword(memberUpdateDto.getPassword());
+            }
+            if (memberUpdateDto.getEmail() != null) {
+                member.setEmail(memberUpdateDto.getEmail());
+            }
+            em.flush();
         }
         return member;
     }
