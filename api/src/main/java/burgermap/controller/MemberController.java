@@ -3,7 +3,6 @@ package burgermap.controller;
 import burgermap.dto.member.MemberChangeableInfoDto;
 import burgermap.dto.member.MemberInfoDto;
 import burgermap.dto.member.MemberJoinRequestDto;
-import burgermap.dto.member.MemberJoinResponseDto;
 import burgermap.dto.member.MemberLoginDto;
 import burgermap.entity.Member;
 import burgermap.service.MemberService;
@@ -39,10 +38,10 @@ public class MemberController {
      * 회원 추가
      */
     @PostMapping
-    public MemberJoinResponseDto addMember(@RequestBody MemberJoinRequestDto memberJoinRequestDto) {
+    public MemberInfoDto addMember(@RequestBody MemberJoinRequestDto memberJoinRequestDto) {
         Member member = cvtToMember(memberJoinRequestDto);
         memberService.addMember(member);
-        return cvtToMemberJoinResponseDto(member);
+        return cvtToMemberInfoDto(member);
     }
 
     /**
@@ -179,15 +178,6 @@ public class MemberController {
         }
 
         return member;
-    }
-
-    private MemberJoinResponseDto cvtToMemberJoinResponseDto(Member member) {
-        MemberJoinResponseDto memberJoinResponseDto = new MemberJoinResponseDto();
-        memberJoinResponseDto.setMemberType(member.getMemberType());
-        memberJoinResponseDto.setLoginId(member.getLoginId());
-        memberJoinResponseDto.setEmail(member.getEmail());
-        memberJoinResponseDto.setNickname(member.getNickname());
-        return memberJoinResponseDto;
     }
 
     private MemberInfoDto cvtToMemberInfoDto(Member member) {
