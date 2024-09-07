@@ -1,18 +1,12 @@
 package burgermap.service;
 
-import burgermap.dto.member.MemberJoinDto;
-import burgermap.dto.member.MemberResponseDto;
-import burgermap.dto.member.MemberUpdateDto;
 import burgermap.entity.Member;
-import burgermap.mapper.MemberMapper;
 import burgermap.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -20,61 +14,74 @@ import java.util.Arrays;
 public class MemberService {
 
     private final MemberRepository repository;
-    public MemberResponseDto addMember(MemberJoinDto memberJoinDto) {
-        // 검증 로직
 
-        // 회원 가입용 DTO -> entity
-        Member member = new Member();
-        MemberMapper.memberJoinDto2Member(memberJoinDto, member);
-
-        // 회원 추가
-        repository.addMember(member);
-        log.info("new member = {}", member);
-
-        // entity -> 응답용 DTO
-        MemberResponseDto memberResponseDto = new MemberResponseDto();
-        MemberMapper.member2MemberResponseDto(member, memberResponseDto);
-
-        return memberResponseDto;
+    public void addMember(Member member) {
+        repository.save(member);
+        log.debug("member added: {}", member);
     }
 
-    public MemberResponseDto findMemberByMemberId(Long memberId) {
-        Member member = repository.findMember(memberId);
-        if (member == null) {  // 해당 식별 번호를 가진 회원이 없는 경우
-            log.info("member(memberId = {}) not found", memberId);
-            return null;
-        }
-        log.info("found member = {}", member);
-        MemberResponseDto memberResponseDto = new MemberResponseDto();
-        MemberMapper.member2MemberResponseDto(member, memberResponseDto);
-
-        return memberResponseDto;
+    public boolean checkIdDuplication(String loginId) {
+        Optional<Member> memberPreoccupying = repository.findByLoginId(loginId);
+        boolean isDuplicated = memberPreoccupying.isPresent();
+        log.debug("id duplication check: {}", isDuplicated);
+        log.debug("preoccupying member: {}", memberPreoccupying.orElse(null));
+        return isDuplicated;
     }
 
-    public MemberResponseDto deleteMember(Long memberId) {
-        Member member = repository.findMember(memberId);
-        if (member == null) {  // 해당 식별 번호를 가진 회원이 없는 경우
-            log.info("member(memberId = {}) not found", memberId);
-            return null;
-        } else {
-            Member deletedMember = repository.deleteMember(memberId);
-            log.info("member deleted = {}", deletedMember);
-            MemberResponseDto memberResponseDto = new MemberResponseDto();
-            MemberMapper.member2MemberResponseDto(deletedMember, memberResponseDto);
-            return memberResponseDto;
-        }
+    public boolean checkEmailDuplication(String email) {
+        Optional<Member> memberPreoccupying = repository.findByEmail(email);
+        boolean isDuplicated = memberPreoccupying.isPresent();
+        log.debug("email duplication check: {}", isDuplicated);
+        log.debug("preoccupying member: {}", memberPreoccupying.orElse(null));
+        return isDuplicated;
     }
 
-    public MemberResponseDto updateMember(Long memberId, MemberUpdateDto memberUpdateDto) {
-        Member member = repository.updateMember(memberId, memberUpdateDto);
-        if (member == null) {  // 해당 식별 번호를 가진 회원이 없는 경우
-            log.info("member(memberId = {}) not found", memberId);
+    public boolean checkNicknameDuplication(String nickname) {
+        Optional<Member> memberPreoccupying = repository.findByNickname(nickname);
+        boolean isDuplicated = memberPreoccupying.isPresent();
+        log.debug("nickname duplication check: {}", isDuplicated);
+        log.debug("preoccupying member: {}", memberPreoccupying.orElse(null));
+        return isDuplicated;
+    }
+
+    public Member login(String loginId, String password) {
+        Optional<Member> member = repository.findByLoginId(loginId);
+        log.debug("login member : {}", member.orElse(null));
+        // 로그인 실패: loginId를 가진 회원이 존재하지 않는 경우, 회원은 존재하되 pw가 다른 경우
+        if (member.isEmpty() || !member.get().getPassword().equals(password)) {
+            log.debug("login failed");
             return null;
         }
+        return member.get();
+    }
 
-        MemberResponseDto memberResponseDto = new MemberResponseDto();
-        MemberMapper.member2MemberResponseDto(member, memberResponseDto);
+    public Member getMyInfo(Long memberId) {
+        Member member = repository.findByMemberId(memberId).get();
+        log.debug("member info: {}", member);
+        return member;
+    }
 
-        return memberResponseDto;
+    public Member changePassword(Long memberId, String newPassword) {
+        Optional<Member> member = repository.updatePassword(memberId, newPassword);
+        log.debug("member password changed: {}", member.get());
+        return member.get();
+    }
+
+    public Member changeEmail(Long memberId, String newEmail) {
+        Optional<Member> member = repository.updateEmail(memberId, newEmail);
+        log.debug("member email changed: {}", member.get());
+        return member.get();
+    }
+
+    public Member changeNickname(Long memberId, String newNickname) {
+        Optional<Member> member = repository.updateNickname(memberId, newNickname);
+        log.debug("member nickname changed: {}", member.get());
+        return member.get();
+    }
+
+    public Member deleteMember(Long memberId) {
+        Optional<Member> member = repository.deleteByMemberId(memberId);
+        log.debug("member deleted: {}", member.get());
+        return member.get();
     }
 }

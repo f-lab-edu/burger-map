@@ -1,20 +1,17 @@
 package burgermap.repository;
 
-import burgermap.dto.member.MemberUpdateDto;
 import burgermap.entity.Member;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface MemberRepository {
-    public Member addMember(Member member);
-
-    public Member findMember(Long memberId);
-
-    public List<Member> findAllMembers();
-
-    public Member deleteMember(Long memberId);
-
-    public Member updateMember(Long memberId, MemberUpdateDto memberUpdateDto);
-
-    public void clear();
+    public Member save(Member member);
+    public Optional<Member> findByMemberId(Long memberId);
+    public Optional<Member> findByLoginId(String loginId);
+    public Optional<Member> findByEmail(String email);
+    public Optional<Member> findByNickname(String nickname);
+    public Optional<Member> updatePassword(Long memberId, String newPassword);
+    public Optional<Member> updateEmail(Long memberId, String newEmail);
+    public Optional<Member> updateNickname(Long memberId, String newNickname);
+    public Optional<Member> deleteByMemberId(Long memberId);
 }
