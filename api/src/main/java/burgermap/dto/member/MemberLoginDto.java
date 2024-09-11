@@ -1,13 +1,13 @@
 package burgermap.dto.member;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@EqualsAndHashCode
-public class MemberResponseDto {
+@NoArgsConstructor
+public class MemberLoginDto {
     private String loginId;
-    private String email;
+    private String password;
 }

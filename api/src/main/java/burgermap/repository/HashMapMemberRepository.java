@@ -1,74 +1,84 @@
 package burgermap.repository;
 
 import burgermap.entity.Member;
+import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-//@Repository
+@Repository
 public class HashMapMemberRepository implements MemberRepository{
 
     private final Map<Long, Member> repository = new ConcurrentHashMap<>();
-    private AtomicLong memberIdCount = new AtomicLong(0);
+    private final AtomicLong memberIdCount = new AtomicLong(0);
 
-    /**
-     * 회원 등록
-     * 등록순으로 member Id 부여
-     */
     @Override
-    public Member addMember(Member member) {
+    public Member save(Member member) {
         member.setMemberId(memberIdCount.incrementAndGet());
-        repository.put(memberIdCount.get(), member);
+        repository.put(member.getMemberId(), member);
         return member;
     }
 
-    /**
-     * member id를 통한 회원 조회
-     */
     @Override
-    public Member findMember(Long memberId) {
-        return repository.get(memberId);
+    public Optional<Member> findByMemberId(Long memberId) {
+        return Optional.ofNullable(repository.get(memberId));
     }
 
-    /**
-     * 모든 회원 조회
-     */
     @Override
-    public List<Member> findAllMembers() {
-        return new ArrayList<>(repository.values());
+    public Optional<Member> findByLoginId(String loginId) {
+        return repository.values().stream()
+                .filter(member -> member.getLoginId().equals(loginId))
+                .findAny();
     }
 
-    /**
-     * 회원 삭제
-     */
     @Override
-    public Member deleteMember(Long memberId) {
-        Member removedMember = repository.remove(memberId);
-        return removedMember;
+    public Optional<Member> findByEmail(String email) {
+        return repository.values().stream()
+                .filter(member -> member.getEmail().equals(email))
+                .findAny();
     }
 
-    /**
-     * 로그인 아이디 중복 확인
-     */
-    public boolean checkLoginIdDuplication(String loginId) {
-        return repository.values()
-                .stream()
-                .anyMatch(member -> member.getLoginId().equals(loginId));
-    }
-
-    /**
-     * 모든 회원 삭제
-     */
     @Override
-    public void clear() {
-        repository.clear();
-        memberIdCount.set(0);
+    public Optional<Member> findByNickname(String nickname) {
+        return repository.values().stream()
+                .filter(member -> member.getNickname().equals(nickname))
+                .findAny();
     }
 
-    public void printAllMembers() {
-        repository.forEach((k, v) -> System.out.println(v));
+    @Override
+    public Optional<Member> updatePassword(Long memberId, String newPassword) {
+        Member member = repository.get(memberId);
+        if (member == null) {
+            return Optional.empty();
+        }
+        member.setPassword(newPassword);
+        return Optional.of(member);
+    }
+
+    @Override
+    public Optional<Member> updateEmail(Long memberId, String newEmail) {
+        Member member = repository.get(memberId);
+        if (member == null) {
+            return Optional.empty();
+        }
+        member.setEmail(newEmail);
+        return Optional.of(member);
+    }
+
+    @Override
+    public Optional<Member> updateNickname(Long memberId, String newNickname) {
+        Member member = repository.get(memberId);
+        if (member == null) {
+            return Optional.empty();
+        }
+        member.setNickname(newNickname);
+        return Optional.of(member);
+    }
+
+    @Override
+    public Optional<Member> deleteByMemberId(Long memberId) {
+        return Optional.ofNullable(repository.remove(memberId));
     }
 }

@@ -1,19 +1,29 @@
 package burgermap.controller;
 
-import burgermap.dto.member.MemberJoinDto;
-import burgermap.dto.member.MemberResponseDto;
+import burgermap.dto.member.MemberChangeableInfoDto;
+import burgermap.dto.member.MemberInfoDto;
+import burgermap.dto.member.MemberJoinRequestDto;
+import burgermap.dto.member.MemberLoginDto;
+import burgermap.entity.Member;
 import burgermap.service.MemberService;
-import jakarta.servlet.http.HttpServletResponse;
+import burgermap.session.SessionConstants;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
+
+import java.util.Map;
 
 
 @Slf4j
@@ -28,31 +38,154 @@ public class MemberController {
      * 회원 추가
      */
     @PostMapping
-    public MemberResponseDto addMember(@RequestBody MemberJoinDto memberJoinDto) {
-        return memberService.addMember(memberJoinDto);
+    public MemberInfoDto addMember(@RequestBody MemberJoinRequestDto memberJoinRequestDto) {
+        Member member = cvtToMember(memberJoinRequestDto);
+        memberService.addMember(member);
+        return cvtToMemberInfoDto(member);
     }
 
     /**
-     * 회원 식별 번호를 통한 회원 조회
+     * 아이디 중복 체크
      */
-    @GetMapping("/{memberId}")
-    public MemberResponseDto findMemberByMemberID(@PathVariable("memberId") Long memberId, HttpServletResponse response) {
-        MemberResponseDto foundMemberDto = memberService.findMemberByMemberId(memberId);
-        if (foundMemberDto == null) {
-            response.setStatus(HttpStatus.NOT_FOUND.value());
-        }
-        return foundMemberDto;
+    @GetMapping("/check-id/{loginId}")
+    public Map<String, Boolean> checkId(@PathVariable String loginId) {
+        boolean isDuplicated = memberService.checkIdDuplication(loginId);
+        return Map.of("available", !isDuplicated);
     }
 
     /**
-     * 회원 식별 번호를 통한 회원 삭제
+     * 이메일 중복 체크
      */
-    @DeleteMapping("/{memberId}")
-    public MemberResponseDto deleteMember(@PathVariable("memberId") Long memberId, HttpServletResponse response) {
-        MemberResponseDto deletedMember = memberService.deleteMember(memberId);
-        if (deletedMember == null) {
-            response.setStatus(HttpStatus.NOT_FOUND.value());
+    @GetMapping("/check-email/{email}")
+    public Map<String, Boolean> checkEmail(@PathVariable String email) {
+        boolean isDuplicated = memberService.checkEmailDuplication(email);
+        return Map.of("available", !isDuplicated);
+    }
+
+    /**
+     * 닉네임 중복 체크
+     */
+    @GetMapping("/check-nickname/{nickname}")
+    public Map<String, Boolean> checkNickname(@PathVariable String nickname) {
+        boolean isDuplicated = memberService.checkNicknameDuplication(nickname);
+        return Map.of("available", !isDuplicated);
+    }
+
+    /**
+     * 로그인
+     * 세션에 회원 식별 아이디 저장
+     */
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, Boolean>> login(@RequestBody MemberLoginDto memberLoginDto, HttpServletRequest request) {
+        Member member = memberService.login(memberLoginDto.getLoginId(), memberLoginDto.getPassword());
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("login", false));
         }
-        return deletedMember;
+        request.getSession().setAttribute(SessionConstants.loginMember, member.getMemberId());
+        return ResponseEntity.ok(Map.of("login", true));
+    }
+
+    /**
+     * 로그아웃
+     */
+    @PostMapping("/logout")
+    public void logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+    }
+
+    /**
+     * 내 정보 조회
+     * 로그인한 회원이 자신의 정보를 조회
+     *  목적: 정보 수정을 위한 기존 정보 조회
+     */
+    @GetMapping("/my-info")
+    public ResponseEntity<MemberInfoDto> getMyInfo(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId) {
+        if (memberId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        Member member = memberService.getMyInfo(memberId);
+        MemberInfoDto memberInfoDto = cvtToMemberInfoDto(member);
+        return ResponseEntity.ok(memberInfoDto);
+    }
+
+    /**
+     * 비밀번호 변경
+     * 로그인한 회원이 자신의 비밀번호를 변경
+     */
+    @PatchMapping("/my-info/password")
+    public ResponseEntity<MemberInfoDto> changePassword(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId, @RequestBody MemberChangeableInfoDto memberChangeableInfoDto) {
+        if (memberId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        Member member = memberService.changePassword(memberId, memberChangeableInfoDto.getPassword());
+        return ResponseEntity.ok(cvtToMemberInfoDto(member));
+    }
+
+    /**
+     * 이메일 변경
+     * 로그인한 회원이 자신의 이메일을 변경
+     */
+    @PatchMapping("/my-info/email")
+    public ResponseEntity<MemberInfoDto> changeEmail(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId, @RequestBody MemberChangeableInfoDto memberChangeableInfoDto) {
+        if (memberId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        Member member = memberService.changeEmail(memberId, memberChangeableInfoDto.getEmail());
+        return ResponseEntity.ok(cvtToMemberInfoDto(member));
+    }
+
+    /**
+     * 닉네임 변경
+     * 로그인한 회원이 자신의 닉네임을 변경
+     */
+    @PatchMapping("/my-info/nickname")
+    public ResponseEntity<MemberInfoDto> changeNickname(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId, @RequestBody MemberChangeableInfoDto memberChangeableInfoDto) {
+        if (memberId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        Member member = memberService.changeNickname(memberId, memberChangeableInfoDto.getNickname());
+        return ResponseEntity.ok(cvtToMemberInfoDto(member));
+    }
+
+    /**
+     * 회원 탈퇴
+     * 로그인한 회원이 자신의 회원 정보를 삭제
+     * 회원 삭제와 동시에 로그아웃 수행
+     */
+    @DeleteMapping("/my-info")
+    public ResponseEntity<MemberInfoDto> deleteMember(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId, HttpServletRequest request) {
+        if (memberId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        Member deletedMember = memberService.deleteMember(memberId);
+        request.getSession(false).invalidate();  // 삭제와 동시에 로그아웃
+
+        return ResponseEntity.ok(cvtToMemberInfoDto(deletedMember));
+    }
+
+    private Member cvtToMember(Object memberDto) {
+        Member member = new Member();
+
+        if (memberDto instanceof MemberJoinRequestDto memberJoinRequestDto) {
+            member.setMemberType(memberJoinRequestDto.getMemberType());
+            member.setLoginId(memberJoinRequestDto.getLoginId());
+            member.setPassword(memberJoinRequestDto.getPassword());
+            member.setEmail(memberJoinRequestDto.getEmail());
+            member.setNickname(memberJoinRequestDto.getNickname());
+        }
+
+        return member;
+    }
+
+    private MemberInfoDto cvtToMemberInfoDto(Member member) {
+        MemberInfoDto memberInfoDto = new MemberInfoDto();
+        memberInfoDto.setMemberType(member.getMemberType());
+        memberInfoDto.setLoginId(member.getLoginId());
+        memberInfoDto.setEmail(member.getEmail());
+        memberInfoDto.setNickname(member.getNickname());
+        return memberInfoDto;
     }
 }
