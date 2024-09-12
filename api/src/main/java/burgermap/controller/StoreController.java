@@ -1,5 +1,6 @@
 package burgermap.controller;
 
+import burgermap.annotation.CheckLogin;
 import burgermap.dto.store.StoreRequestDto;
 import burgermap.dto.store.StoreInfoDto;
 import burgermap.entity.Store;
@@ -36,12 +37,10 @@ public class StoreController {
     /**
      * 가게 추가
      */
+    @CheckLogin
     @PostMapping
     public ResponseEntity<StoreInfoDto> addStore(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId,
                                                  @RequestBody StoreRequestDto storeRequestDto) {
-        if (memberId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
         System.out.println("storeAddRequestDto = " + storeRequestDto);
         Store store = cvtToStore(storeRequestDto, memberId);
         storeService.addStore(store);
@@ -87,11 +86,9 @@ public class StoreController {
     /**
      * OWNER 회원이 등록한 모든 가게 정보 조회
      */
+    @CheckLogin
     @GetMapping("/my-stores")
     public ResponseEntity<List<StoreInfoDto>> getMyStores(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId) {
-        if (memberId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
         List<Store> stores = storeService.getMyStores(memberId);
         List<StoreInfoDto> storeDtolist = stores.stream().map(store -> cvtToStoreInfoDto(store)).toList();
         return ResponseEntity.ok(storeDtolist);
@@ -100,14 +97,11 @@ public class StoreController {
     /**
      * OWNER 회원이 소유한 가게 정보 수정
      */
+    @CheckLogin
     @PutMapping("/{storeId}")
     public ResponseEntity<StoreInfoDto> updateStore(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId,
                                                     @PathVariable Long storeId,
                                                     @RequestBody StoreRequestDto storeRequestDto) {
-        if (memberId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-
         Store newStoreInfo = cvtToStore(storeRequestDto, memberId);
         Store newStore = storeService.updateStore(memberId, storeId, newStoreInfo);
 
@@ -120,13 +114,10 @@ public class StoreController {
     /**
      * OWNER 회원이 소유한 가게 정보 수정 삭제
      */
+    @CheckLogin
     @DeleteMapping("/{storeId}")
     public ResponseEntity<StoreInfoDto> deleteStore(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId,
                                                     @PathVariable Long storeId) {
-        if (memberId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-
         Store store = storeService.deleteStore(memberId, storeId);
         if (store == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

@@ -1,5 +1,6 @@
 package burgermap.controller;
 
+import burgermap.annotation.CheckLogin;
 import burgermap.dto.member.MemberChangeableInfoDto;
 import burgermap.dto.member.MemberInfoDto;
 import burgermap.dto.member.MemberJoinRequestDto;
@@ -101,11 +102,9 @@ public class MemberController {
      * 로그인한 회원이 자신의 정보를 조회
      *  목적: 정보 수정을 위한 기존 정보 조회
      */
+    @CheckLogin
     @GetMapping("/my-info")
     public ResponseEntity<MemberInfoDto> getMyInfo(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId) {
-        if (memberId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
         Member member = memberService.getMyInfo(memberId);
         MemberInfoDto memberInfoDto = cvtToMemberInfoDto(member);
         return ResponseEntity.ok(memberInfoDto);
@@ -115,11 +114,9 @@ public class MemberController {
      * 비밀번호 변경
      * 로그인한 회원이 자신의 비밀번호를 변경
      */
+    @CheckLogin
     @PatchMapping("/my-info/password")
     public ResponseEntity<MemberInfoDto> changePassword(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId, @RequestBody MemberChangeableInfoDto memberChangeableInfoDto) {
-        if (memberId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
         Member member = memberService.changePassword(memberId, memberChangeableInfoDto.getPassword());
         return ResponseEntity.ok(cvtToMemberInfoDto(member));
     }
@@ -128,11 +125,9 @@ public class MemberController {
      * 이메일 변경
      * 로그인한 회원이 자신의 이메일을 변경
      */
+    @CheckLogin
     @PatchMapping("/my-info/email")
     public ResponseEntity<MemberInfoDto> changeEmail(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId, @RequestBody MemberChangeableInfoDto memberChangeableInfoDto) {
-        if (memberId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
         Member member = memberService.changeEmail(memberId, memberChangeableInfoDto.getEmail());
         return ResponseEntity.ok(cvtToMemberInfoDto(member));
     }
@@ -141,11 +136,9 @@ public class MemberController {
      * 닉네임 변경
      * 로그인한 회원이 자신의 닉네임을 변경
      */
+    @CheckLogin
     @PatchMapping("/my-info/nickname")
     public ResponseEntity<MemberInfoDto> changeNickname(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId, @RequestBody MemberChangeableInfoDto memberChangeableInfoDto) {
-        if (memberId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
         Member member = memberService.changeNickname(memberId, memberChangeableInfoDto.getNickname());
         return ResponseEntity.ok(cvtToMemberInfoDto(member));
     }
@@ -155,11 +148,9 @@ public class MemberController {
      * 로그인한 회원이 자신의 회원 정보를 삭제
      * 회원 삭제와 동시에 로그아웃 수행
      */
+    @CheckLogin
     @DeleteMapping("/my-info")
     public ResponseEntity<MemberInfoDto> deleteMember(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId, HttpServletRequest request) {
-        if (memberId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
         Member deletedMember = memberService.deleteMember(memberId);
         request.getSession(false).invalidate();  // 삭제와 동시에 로그아웃
 
