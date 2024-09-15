@@ -49,16 +49,6 @@ public class StoreController {
     }
 
     /**
-     * 예외 처리: OWNER가 아닌 회원이 가게 추가 시도
-     * 가게 추가 시, 멤버 타입이 OWNER가 아닌 경우 401 UNAUTHORIZED 반환
-     */
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(NotOwnerMemberException.class)
-    public Map<String, String> handleNotOwnerMemberException(NotOwnerMemberException e) {
-        return Map.of("message", e.getMessage());
-    }
-
-    /**
      * 특정 가게 조회
      */
     @GetMapping("/{storeId}")
