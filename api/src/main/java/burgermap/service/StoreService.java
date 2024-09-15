@@ -4,6 +4,7 @@ import burgermap.entity.Member;
 import burgermap.entity.Store;
 import burgermap.enums.MemberType;
 import burgermap.exception.store.NotOwnerMemberException;
+import burgermap.exception.store.StoreNotExistException;
 import burgermap.repository.MemberRepository;
 import burgermap.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +57,7 @@ public class StoreService {
 
         Store oldStore = storeRepository.findByStoreId(storeId).orElse(null);
         if (oldStore == null) {  // 존재하지 않는 가게
-            return null;
+            throw new StoreNotExistException(storeId);
         }
         else if (!oldStore.getMemberId().equals(requestMemberId)) {  // 요청자가 가게의 소유자가 아님
             throw new NotOwnerMemberException("member is not owner of the store.");
@@ -74,7 +75,7 @@ public class StoreService {
 
         Store oldStore = storeRepository.findByStoreId(storeId).orElse(null);
         if (oldStore == null) {  // 존재하지 않는 가게
-            return null;
+            throw new StoreNotExistException(storeId);
         }
         else if (!oldStore.getMemberId().equals(requestMemberId)) {  // 요청자가 가게의 소유자가 아님
             throw new NotOwnerMemberException("member is not owner of the store.");

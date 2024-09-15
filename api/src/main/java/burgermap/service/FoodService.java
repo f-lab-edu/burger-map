@@ -7,6 +7,7 @@ import burgermap.entity.SideMenu;
 import burgermap.entity.Store;
 import burgermap.enums.MemberType;
 import burgermap.exception.store.NotOwnerMemberException;
+import burgermap.exception.store.StoreNotExistException;
 import burgermap.repository.FoodRepository;
 import burgermap.repository.MemberRepository;
 import burgermap.repository.StoreRepository;
@@ -33,7 +34,7 @@ public class FoodService {
 
         Store store = storeRepository.findByStoreId(burger.getStoreId()).orElse(null);
         if (store == null) {  // 존재하지 않는 가게
-            return null;
+            throw new StoreNotExistException(burger.getStoreId());
         }
 
         Food savedFood = foodRepository.save(burger);
@@ -50,7 +51,7 @@ public class FoodService {
 
         Store store = storeRepository.findByStoreId(sideMenu.getStoreId()).orElse(null);
         if (store == null) {  // 존재하지 않는 가게
-            return null;
+            throw new StoreNotExistException(sideMenu.getStoreId());
         }
 
         Food savedFood = foodRepository.save(sideMenu);

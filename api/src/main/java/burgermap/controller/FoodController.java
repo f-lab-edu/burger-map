@@ -38,10 +38,6 @@ public class FoodController {
                                                    @RequestBody BurgerInfoRequestDto burgerInfoRequestDto) {
         Burger burger = cvtToBurger(burgerInfoRequestDto, storeId);
         foodService.addBurger(memberId, burger);
-        if (burger == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-
         return ResponseEntity.ok(cvtToBurgerInfoDto(burger));
     }
 
@@ -52,10 +48,6 @@ public class FoodController {
                                                      @RequestBody SideMenuInfoRequestDto sideMenuInfoRequestDto) {
         SideMenu sideMenu = cvtToSideMenu(sideMenuInfoRequestDto, storeId);
         foodService.addSideMenu(memberId, sideMenu);
-        if (sideMenu == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-
         return ResponseEntity.ok(cvtToSideMenuInfoDto(sideMenu));
     }
 

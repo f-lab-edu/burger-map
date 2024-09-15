@@ -54,9 +54,6 @@ public class StoreController {
     @GetMapping("/{storeId}")
     public ResponseEntity<StoreInfoDto> getStore(@PathVariable Long storeId) {
         Store store = storeService.getStore(storeId);
-        if (store == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
         return ResponseEntity.ok(cvtToStoreInfoDto(store));
     }
 
@@ -94,10 +91,6 @@ public class StoreController {
                                                     @RequestBody StoreRequestDto storeRequestDto) {
         Store newStoreInfo = cvtToStore(storeRequestDto, memberId);
         Store newStore = storeService.updateStore(memberId, storeId, newStoreInfo);
-
-        if (newStore == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
         return ResponseEntity.ok(cvtToStoreInfoDto(newStore));
     }
 
@@ -109,9 +102,6 @@ public class StoreController {
     public ResponseEntity<StoreInfoDto> deleteStore(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId,
                                                     @PathVariable Long storeId) {
         Store store = storeService.deleteStore(memberId, storeId);
-        if (store == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
         return ResponseEntity.ok(cvtToStoreInfoDto(store));
     }
 
