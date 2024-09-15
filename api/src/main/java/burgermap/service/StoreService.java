@@ -33,7 +33,7 @@ public class StoreService {
     }
 
     public Store getStore(Long storeId) {
-        Store store = storeRepository.findByStoreId(storeId).orElse(null);
+        Store store = storeRepository.findByStoreId(storeId).orElseThrow(() -> new StoreNotExistException(storeId));
         log.debug("store info: {}", store);
         return store;
     }

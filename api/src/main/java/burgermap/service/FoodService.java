@@ -61,6 +61,7 @@ public class FoodService {
     }
 
     public List<Food> getFoods(Long storeId) {
+        storeRepository.findByStoreId(storeId).orElseThrow(() -> new StoreNotExistException(storeId));
         List<Food> foods = foodRepository.findByStoreId(storeId);
         log.debug("foods: {}", foods);
         return foods;
