@@ -1,5 +1,6 @@
 package burgermap.enums;
 
+import burgermap.exception.food.FoodAttributeNotExistException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +19,6 @@ public enum MenuType {
                 return menuType;
             }
         }
-        return null;
+        throw new FoodAttributeNotExistException("Menu Type %s does not exist".formatted(value));
     }
 }
