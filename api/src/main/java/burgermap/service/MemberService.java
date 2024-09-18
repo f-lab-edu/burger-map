@@ -1,6 +1,8 @@
 package burgermap.service;
 
 import burgermap.entity.Member;
+import burgermap.enums.MemberType;
+import burgermap.exception.store.NotOwnerMemberException;
 import burgermap.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -83,5 +85,15 @@ public class MemberService {
         Optional<Member> member = repository.deleteByMemberId(memberId);
         log.debug("member deleted: {}", member.get());
         return member.get();
+    }
+
+    /**
+     * memberId에 해당하는 회원이 OWNER가 아니면 NotOwnerMemberException을 발생시킴
+     */
+    public void isMemberTypeOwner(Long memberId) {
+        Member member = repository.findByMemberId(memberId).get();
+        if (member.getMemberType() != MemberType.OWNER) {
+            throw new NotOwnerMemberException("member type is not OWNER.");
+        }
     }
 }

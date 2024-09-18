@@ -25,12 +25,12 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class FoodService {
+    private final MemberService memberService;
+    private final StoreService storeService;
+
     private final IngredientRepository ingredientRepository;
     private final MenuCategoryRepository menuCategoryRepository;
     private final FoodRepository foodRepository;
-
-    private final MemberRepository memberRepository;
-    private final StoreRepository storeRepository;
 
     public List<String> getMenuTypes() {
         return Arrays.stream(MenuType.values()).map(MenuType::getValue).toList();
@@ -45,17 +45,9 @@ public class FoodService {
     }
 
     public Food addFood(Food food, Long storeId, Long memberId) {
-        Member member = memberRepository.findByMemberId(memberId).get();
-        if (member.getMemberType() != MemberType.OWNER) {
-            throw new NotOwnerMemberException("member type is not OWNER.");
-        }
-        Store oldStore = storeRepository.findByStoreId(storeId).orElse(null);
-        if (oldStore == null) {  // 존재하지 않는 가게
-            throw new StoreNotExistException(storeId);
-        }
-        else if (!oldStore.getMemberId().equals(memberId)) {  // 요청자가 가게의 소유자가 아님
-            throw new NotOwnerMemberException("member is not owner of the store.");
-        }
+        memberService.isMemberTypeOwner(memberId);
+        Store store = storeService.checkStoreExistence(storeId);
+        storeService.checkStoreBelongTo(store, memberId);
 
         return foodRepository.save(food);
     }
