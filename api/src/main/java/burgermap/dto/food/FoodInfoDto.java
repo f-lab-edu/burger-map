@@ -20,7 +20,7 @@ public class FoodInfoDto {
     private String name;
     private Integer price;
     private String description;
-    private MenuType menuType;
+    private String menuTypeValue;
     private MenuCategory menuCategory;
     private List<Ingredient> ingredients;
 }
