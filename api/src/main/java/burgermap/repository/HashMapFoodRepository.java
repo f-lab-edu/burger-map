@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-@Repository
+//@Repository
 public class HashMapFoodRepository implements FoodRepository{
     private static final Map<Long, Food> repository = new ConcurrentHashMap<>();
     private final AtomicLong foodIdCount = new AtomicLong(0);

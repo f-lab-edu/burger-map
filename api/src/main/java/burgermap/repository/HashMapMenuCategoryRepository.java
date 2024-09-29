@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-@Repository
+//@Repository
 @Slf4j
 public class HashMapMenuCategoryRepository implements MenuCategoryRepository {
     private static final Map<Long, MenuCategory> repository = new ConcurrentHashMap<>();
