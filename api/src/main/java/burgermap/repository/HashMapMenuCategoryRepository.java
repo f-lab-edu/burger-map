@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -39,5 +40,10 @@ public class HashMapMenuCategoryRepository implements MenuCategoryRepository {
     @Override
     public List<MenuCategory> findAll() {
         return repository.values().stream().toList();
+    }
+
+    @Override
+    public Optional<MenuCategory> findByMenuCategoryId(Long menuCategoryId) {
+        return Optional.ofNullable(repository.get(menuCategoryId));
     }
 }

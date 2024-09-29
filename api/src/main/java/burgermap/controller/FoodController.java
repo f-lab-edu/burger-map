@@ -9,7 +9,6 @@ import burgermap.entity.Food;
 import burgermap.entity.Ingredient;
 import burgermap.entity.MenuCategory;
 import burgermap.enums.MenuType;
-import burgermap.repository.IngredientRepository;
 import burgermap.service.FoodService;
 import burgermap.session.SessionConstants;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 @RestController
 @RequiredArgsConstructor
@@ -84,8 +82,8 @@ public class FoodController {
         food.setPrice(foodInfoRequestDto.getPrice());
         food.setDescription(foodInfoRequestDto.getDescription());
         food.setMenuType(MenuType.from(foodInfoRequestDto.getMenuTypeValue()));
-        food.setMenuCategory(foodInfoRequestDto.getMenuCategory());
-        food.setIngredients(foodInfoRequestDto.getIngredients());
+        food.setMenuCategory(foodService.menuCategoryIdToMenuCategory(foodInfoRequestDto.getMenuCategoryId()));
+        food.setIngredients(foodService.ingredientIdsToIngredients(foodInfoRequestDto.getIngredientIds()));
         return food;
     }
 

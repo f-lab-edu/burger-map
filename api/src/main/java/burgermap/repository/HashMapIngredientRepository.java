@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -38,5 +39,11 @@ public class HashMapIngredientRepository implements IngredientRepository {
     @Override
     public List<Ingredient> findAll() {
         return repository.values().stream().toList();
+    }
+
+    @Override
+    public Optional<Ingredient> findByIngredientId(Long ingredientId) {
+        Ingredient ingredient = repository.get(ingredientId);
+        return Optional.ofNullable(ingredient);
     }
 }
