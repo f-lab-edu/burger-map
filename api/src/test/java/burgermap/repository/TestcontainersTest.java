@@ -29,7 +29,7 @@ class TestcontainersTest {
         registry.add("spring.jpa.hibernate.ddl-auto", () -> "create");
         registry.add("spring.jpa.properties.hibernate.hbm2ddl.import_files", () -> "init.sql");
         registry.add("logging.level.org.hibernate.SQL", () -> "DEBUG");
-        registry.add("logging.level.org.hibernate.orm.dbc.bind", () -> "TRACE");
+        registry.add("logging.level.org.hibernate.orm.jdbc.bind", () -> "TRACE");
     }
 
     @Test
