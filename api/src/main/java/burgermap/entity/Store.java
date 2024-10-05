@@ -13,7 +13,8 @@ import lombok.ToString;
 @AllArgsConstructor
 public class Store {
     private Long storeId;  // id
-    private Long memberId;
+//    private Long memberId;
+    private Member member;
     private String name;
     private String address;
     private String phone;

@@ -31,7 +31,7 @@ public class HashMapStoreRepository implements StoreRepository{
     @Override
     public List<Store> findByMemberId(Long memberId) {
         List<Store> stores = repository.values().stream()
-                .filter(store -> store.getMemberId().equals(memberId))
+                .filter(store -> store.getMember().getMemberId().equals(memberId))
                 .toList();
         return stores;
     }

@@ -3,6 +3,7 @@ package burgermap.service;
 import burgermap.entity.Store;
 import burgermap.exception.store.NotOwnerMemberException;
 import burgermap.exception.store.StoreNotExistException;
+import burgermap.repository.MemberRepository;
 import burgermap.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,10 +19,11 @@ public class StoreService {
     private final MemberService memberService;
 
     private final StoreRepository storeRepository;
+    private final MemberRepository memberRepository;
 
-    public void addStore(Store store) {
-        memberService.isMemberTypeOwner(store.getMemberId());
-
+    public void addStore(Store store, Long memberId) {
+        memberService.isMemberTypeOwner(memberId);
+        store.setMember(memberRepository.findByMemberId(memberId).orElseThrow());
         storeRepository.save(store);
         log.debug("store added: {}", store);
     }
@@ -44,7 +46,7 @@ public class StoreService {
         memberService.isMemberTypeOwner(requestMemberId);
         Store oldStore = checkStoreExistence(storeId);
         checkStoreBelongTo(oldStore, requestMemberId);
-
+        newStoreInfo.setMember(memberRepository.findByMemberId(requestMemberId).orElseThrow());
         Optional<Store> newStore = storeRepository.updateStore(storeId, newStoreInfo);
         return newStore.orElse(null);
     }
@@ -73,7 +75,7 @@ public class StoreService {
      * store가 memberId의 소유가 아니면 NotOwnerMemberException을 발생시킴
      */
     public void checkStoreBelongTo(Store store, Long memberId) {
-        if (!store.getMemberId().equals(memberId)) {
+        if (!store.getMember().getMemberId().equals(memberId)) {
             throw new NotOwnerMemberException("member is not owner of the store.");
         }
     }
