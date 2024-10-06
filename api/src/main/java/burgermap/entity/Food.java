@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,7 +26,8 @@ public class Food {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long foodId;
-    private Long storeId;
+    @ManyToOne
+    private Store store;
     private String name;
     private Integer price;
     private String description;
