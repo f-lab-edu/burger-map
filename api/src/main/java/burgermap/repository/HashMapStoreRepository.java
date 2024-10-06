@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
-@Repository
+//@Repository
 public class HashMapStoreRepository implements StoreRepository{
 
     private final Map<Long, Store> repository = new ConcurrentHashMap<>();
