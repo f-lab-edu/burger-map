@@ -54,6 +54,8 @@ public class FoodService {
         Store store = storeService.checkStoreExistence(storeId);
         storeService.checkStoreBelongTo(store, memberId);
 
+        food.setStore(store);
+
         return foodRepository.save(food);
     }
 

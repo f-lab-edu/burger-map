@@ -41,9 +41,8 @@ public class StoreController {
     @PostMapping
     public ResponseEntity<StoreInfoDto> addStore(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId,
                                                  @RequestBody StoreRequestDto storeRequestDto) {
-        System.out.println("storeAddRequestDto = " + storeRequestDto);
-        Store store = cvtToStore(storeRequestDto, memberId);
-        storeService.addStore(store);
+        Store store = cvtToStore(storeRequestDto);
+        storeService.addStore(store, memberId);
         System.out.println("store = " + store);
         return ResponseEntity.ok(cvtToStoreInfoDto(store));
     }
@@ -89,7 +88,7 @@ public class StoreController {
     public ResponseEntity<StoreInfoDto> updateStore(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId,
                                                     @PathVariable Long storeId,
                                                     @RequestBody StoreRequestDto storeRequestDto) {
-        Store newStoreInfo = cvtToStore(storeRequestDto, memberId);
+        Store newStoreInfo = cvtToStore(storeRequestDto);
         Store newStore = storeService.updateStore(memberId, storeId, newStoreInfo);
         return ResponseEntity.ok(cvtToStoreInfoDto(newStore));
     }
@@ -105,7 +104,7 @@ public class StoreController {
         return ResponseEntity.ok(cvtToStoreInfoDto(store));
     }
 
-    public Store cvtToStore(Object storeDto, Long memberId) {
+    public Store cvtToStore(Object storeDto) {
         Store store = new Store();
 
         if (storeDto instanceof StoreRequestDto storeRequestDto) {
@@ -113,7 +112,7 @@ public class StoreController {
             store.setAddress(storeRequestDto.getAddress());
             store.setPhone(storeRequestDto.getPhone());
             store.setIntroduction(storeRequestDto.getIntroduction());
-            store.setMemberId(memberId);
+            // member 필드는 서비스 레이어에서 설정
         }
 
         return store;

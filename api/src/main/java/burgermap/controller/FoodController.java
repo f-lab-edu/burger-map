@@ -56,7 +56,7 @@ public class FoodController {
             @SessionAttribute(name = SessionConstants.loginMember) Long memberId,
             @PathVariable Long storeId,
             @RequestBody FoodInfoRequestDto foodInfoRequestDto) {
-        Food food = cvtToFood(foodInfoRequestDto, storeId);
+        Food food = cvtToFood(foodInfoRequestDto);
         Food addedFood = foodService.addFood(food, storeId, memberId);
         return ResponseEntity.ok(cvtToFoodInfoDto(addedFood));
     }
@@ -75,9 +75,8 @@ public class FoodController {
         return ingredientInfoDto;
     }
 
-    public Food cvtToFood(FoodInfoRequestDto foodInfoRequestDto, Long storeId) {
+    public Food cvtToFood(FoodInfoRequestDto foodInfoRequestDto) {
         Food food = new Food();
-        food.setStoreId(storeId);
         food.setName(foodInfoRequestDto.getName());
         food.setPrice(foodInfoRequestDto.getPrice());
         food.setDescription(foodInfoRequestDto.getDescription());
@@ -90,7 +89,7 @@ public class FoodController {
     public FoodInfoDto cvtToFoodInfoDto(Food food) {
         FoodInfoDto foodInfoDto = new FoodInfoDto();
         foodInfoDto.setFoodId(food.getFoodId());
-        foodInfoDto.setStoreId(food.getStoreId());
+        foodInfoDto.setStoreId(food.getStore().getStoreId());
         foodInfoDto.setName(food.getName());
         foodInfoDto.setPrice(food.getPrice());
         foodInfoDto.setDescription(food.getDescription());
