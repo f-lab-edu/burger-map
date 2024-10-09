@@ -62,4 +62,15 @@ class MySqlIngredientRepositoryTest extends TestcontainersTest {
 
         assertThat(ingredient).hasValueSatisfying(i -> assertThat(i.getName()).isEqualTo(ingredientName));
     }
+
+    @Test
+    @DisplayName("존재하지 않는 재료 번호로 재료 조회")
+    void findByUnregisteredIngredientId() {
+        // 존재하지 않는 재료 번호(-1L, Long 최댓값)로 조회, 결과: Optional.empty()
+        Optional<Ingredient> ingredientNegativeId = repository.findByIngredientId(-1L);
+        Optional<Ingredient> ingredientUnregisteredId = repository.findByIngredientId(Long.MAX_VALUE);
+
+        assertThat(ingredientNegativeId).isEmpty();
+        assertThat(ingredientUnregisteredId).isEmpty();
+    }
 }
