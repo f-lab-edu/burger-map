@@ -46,11 +46,14 @@ public class StoreService {
 
     public Store updateStore(Long requestMemberId, Long storeId, Store newStoreInfo) {
         memberService.isMemberTypeOwner(requestMemberId);
-        Store oldStore = checkStoreExistence(storeId);
-        checkStoreBelongTo(oldStore, requestMemberId);
-        newStoreInfo.setMember(memberRepository.findByMemberId(requestMemberId).orElseThrow());
-        Optional<Store> newStore = storeRepository.updateStore(storeId, newStoreInfo);
-        return newStore.orElse(null);
+        Store store = checkStoreExistence(storeId);
+        checkStoreBelongTo(store, requestMemberId);
+
+        store.setName(newStoreInfo.getName());
+        store.setAddress(newStoreInfo.getAddress());
+        store.setPhone(newStoreInfo.getPhone());
+        store.setIntroduction(newStoreInfo.getIntroduction());
+        return store;
     }
 
     public Store deleteStore(Long requestMemberId, Long storeId) {

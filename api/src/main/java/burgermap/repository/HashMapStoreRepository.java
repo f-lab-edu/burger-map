@@ -37,18 +37,6 @@ public class HashMapStoreRepository implements StoreRepository{
     }
 
     @Override
-    public Optional<Store> updateStore(Long storeId, Store newStore) {
-        Store oldStore = repository.get(storeId);
-        if (oldStore == null) {
-            return Optional.empty();
-        }
-
-        newStore.setStoreId(storeId);
-        repository.put(storeId, newStore);
-        return Optional.of(newStore);
-    }
-
-    @Override
     public Optional<Store> deleteByStoreId(Long storeId) {
         Store store = repository.remove(storeId);
         return Optional.ofNullable(store);
