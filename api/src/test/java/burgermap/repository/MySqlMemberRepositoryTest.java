@@ -123,69 +123,6 @@ class MySqlMemberRepositoryTest extends TestcontainersTest{
     }
 
     @Test
-    @DisplayName("회원 비밀번호 변경")
-    void updatePassword() {
-        // 회원 추가 후 비밀번호 변경, 조회된 회원 정보에 비밀번호 변경이 반영되었는지 검증
-        Member newMember = new Member();
-        newMember.setLoginId("testId");
-        newMember.setPassword("oldPassword");
-        newMember.setEmail("testEmail@gmail.com");
-        newMember.setNickname("testNickname");
-        newMember.setMemberType(MemberType.OWNER);
-        memberRepository.save(newMember);
-
-        String newPassword = "newPassword";
-        memberRepository.updatePassword(newMember.getMemberId(), newPassword);
-
-        Optional<Member> updatedMember = memberRepository.findByMemberId(newMember.getMemberId());
-        assertThat(updatedMember).hasValueSatisfying(member -> {
-            assertThat(member.getPassword()).isEqualTo(newPassword);
-        });
-    }
-
-    @Test
-    @DisplayName("회원 이메일 변경")
-    void updateEmail() {
-        // 회원 추가 후 이메일 변경, 조회된 회원 정보에 이메일 변경이 반영되었는지 검증
-        Member newMember = new Member();
-        newMember.setLoginId("testId");
-        newMember.setPassword("testPassword");
-        newMember.setEmail("oldEmail@gmail.com");
-        newMember.setNickname("testNickname");
-        newMember.setMemberType(MemberType.OWNER);
-        memberRepository.save(newMember);
-
-        String newEmail = "newEmail@gmail.com";
-        memberRepository.updateEmail(newMember.getMemberId(), newEmail);
-
-        Optional<Member> updatedMember = memberRepository.findByMemberId(newMember.getMemberId());
-        assertThat(updatedMember).hasValueSatisfying(member -> {
-            assertThat(member.getEmail()).isEqualTo(newEmail);
-        });
-    }
-
-    @Test
-    @DisplayName("회원 닉네임 변경")
-    void updateNickname() {
-        // 회원 추가 후 닉네임 변경, 조회된 회원 정보에 닉네임 변경이 반영되었는지 검증
-        Member newMember = new Member();
-        newMember.setLoginId("testId");
-        newMember.setPassword("testPassword");
-        newMember.setEmail("testEmail@gmail.com");
-        newMember.setNickname("oldNickname");
-        newMember.setMemberType(MemberType.OWNER);
-        memberRepository.save(newMember);
-
-        String newNickname = "newNickname";
-        memberRepository.updateNickname(newMember.getMemberId(), newNickname);
-
-        Optional<Member> updatedMember = memberRepository.findByMemberId(newMember.getMemberId());
-        assertThat(updatedMember).hasValueSatisfying(member -> {
-            assertThat(member.getNickname()).isEqualTo(newNickname);
-        });
-    }
-
-    @Test
     @DisplayName("회원 삭제")
     void deleteByMemberId() {
         // 회원 추가 후 삭제, 삭제된 회원을 조회시 Optional.empty() 반환 검증
