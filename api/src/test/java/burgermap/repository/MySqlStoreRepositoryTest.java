@@ -139,40 +139,6 @@ class MySqlStoreRepositoryTest extends TestcontainersTest {
     }
 
     @Test
-    @DisplayName("가게 정보 수정")
-    void updateStore() {
-        // 가게 등록 후 정보 수정, 조회된 가게 정보에 수정된 정보가 반영되었는지 검증
-        Member member = new Member();
-        member.setMemberType(MemberType.OWNER);
-        entityManager.persist(member);
-
-        Store oldStore = new Store();
-        oldStore.setMember(member);
-        oldStore.setName("oldStore");
-        oldStore.setPhone("010-1234-1111");
-        oldStore.setAddress("oldAddress");
-        oldStore.setIntroduction("oldIntroduction");
-        storeRepository.save(oldStore);
-
-        Store newStore = new Store();
-        newStore.setMember(member);
-        newStore.setName("newStore");
-        newStore.setPhone("010-1234-2222");
-        newStore.setAddress("newAddress");
-        newStore.setIntroduction("newIntroduction");
-        storeRepository.updateStore(oldStore.getStoreId(), newStore);
-
-        Optional<Store> updatedStore = storeRepository.findByStoreId(oldStore.getStoreId());
-
-        assertThat(updatedStore).hasValueSatisfying(store -> {
-            assertThat(store.getName()).isEqualTo(newStore.getName());
-            assertThat(store.getPhone()).isEqualTo(newStore.getPhone());
-            assertThat(store.getAddress()).isEqualTo(newStore.getAddress());
-            assertThat(store.getIntroduction()).isEqualTo(newStore.getIntroduction());
-        });
-    }
-
-    @Test
     @DisplayName("가게 삭제")
     void deleteByStoreId() {
         // 가게 등록 후 삭제, 삭제된 가게 정보가 조회시 Optional.empty() 반환 검증

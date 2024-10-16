@@ -48,36 +48,6 @@ public class HashMapMemberRepository implements MemberRepository{
     }
 
     @Override
-    public Optional<Member> updatePassword(Long memberId, String newPassword) {
-        Member member = repository.get(memberId);
-        if (member == null) {
-            return Optional.empty();
-        }
-        member.setPassword(newPassword);
-        return Optional.of(member);
-    }
-
-    @Override
-    public Optional<Member> updateEmail(Long memberId, String newEmail) {
-        Member member = repository.get(memberId);
-        if (member == null) {
-            return Optional.empty();
-        }
-        member.setEmail(newEmail);
-        return Optional.of(member);
-    }
-
-    @Override
-    public Optional<Member> updateNickname(Long memberId, String newNickname) {
-        Member member = repository.get(memberId);
-        if (member == null) {
-            return Optional.empty();
-        }
-        member.setNickname(newNickname);
-        return Optional.of(member);
-    }
-
-    @Override
     public Optional<Member> deleteByMemberId(Long memberId) {
         return Optional.ofNullable(repository.remove(memberId));
     }

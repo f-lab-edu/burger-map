@@ -66,21 +66,25 @@ public class MemberService {
     }
 
     public Member changePassword(Long memberId, String newPassword) {
-        Optional<Member> member = repository.updatePassword(memberId, newPassword);
-        log.debug("member password changed: {}", member.get());
-        return member.get();
+        // 로그인이 필요하므로 회원 조회 결과가 존재
+        Member member = repository.findByMemberId(memberId).get();
+        member.setPassword(newPassword);
+        log.debug("member password changed: {}", member);
+        return member;
     }
 
     public Member changeEmail(Long memberId, String newEmail) {
-        Optional<Member> member = repository.updateEmail(memberId, newEmail);
-        log.debug("member email changed: {}", member.get());
-        return member.get();
+        Member member = repository.findByMemberId(memberId).get();
+        member.setEmail(newEmail);
+        log.debug("member email changed: {}", member);
+        return member;
     }
 
     public Member changeNickname(Long memberId, String newNickname) {
-        Optional<Member> member = repository.updateNickname(memberId, newNickname);
-        log.debug("member nickname changed: {}", member.get());
-        return member.get();
+        Member member = repository.findByMemberId(memberId).get();
+        member.setNickname(newNickname);
+        log.debug("member nickname changed: {}", member);
+        return member;
     }
 
     public Member deleteMember(Long memberId) {

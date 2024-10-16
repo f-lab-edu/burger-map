@@ -39,27 +39,6 @@ public class MySqlMemberRepository implements MemberRepository {
     }
 
     @Override
-    public Optional<Member> updatePassword(Long memberId, String newPassword) {
-        Member member = repository.findById(memberId).orElseThrow();
-        member.setPassword(newPassword);
-        return Optional.of(member);
-    }
-
-    @Override
-    public Optional<Member> updateEmail(Long memberId, String newEmail) {
-        Member member = repository.findById(memberId).orElseThrow();
-        member.setEmail(newEmail);
-        return Optional.of(member);
-    }
-
-    @Override
-    public Optional<Member> updateNickname(Long memberId, String newNickname) {
-        Member member = repository.findById(memberId).orElseThrow();
-        member.setNickname(newNickname);
-        return Optional.of(member);
-    }
-
-    @Override
     public Optional<Member> deleteByMemberId(Long memberId) {
         Member member = repository.findById(memberId).orElseThrow();
         repository.deleteById(memberId);
