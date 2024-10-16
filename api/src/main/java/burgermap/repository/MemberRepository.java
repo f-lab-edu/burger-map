@@ -10,8 +10,5 @@ public interface MemberRepository {
     public Optional<Member> findByLoginId(String loginId);
     public Optional<Member> findByEmail(String email);
     public Optional<Member> findByNickname(String nickname);
-    public Optional<Member> updatePassword(Long memberId, String newPassword);
-    public Optional<Member> updateEmail(Long memberId, String newEmail);
-    public Optional<Member> updateNickname(Long memberId, String newNickname);
     public Optional<Member> deleteByMemberId(Long memberId);
 }

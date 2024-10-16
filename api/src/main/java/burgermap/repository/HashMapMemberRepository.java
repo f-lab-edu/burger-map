@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-@Repository
+//@Repository
 public class HashMapMemberRepository implements MemberRepository{
 
     private final Map<Long, Member> repository = new ConcurrentHashMap<>();
@@ -45,36 +45,6 @@ public class HashMapMemberRepository implements MemberRepository{
         return repository.values().stream()
                 .filter(member -> member.getNickname().equals(nickname))
                 .findAny();
-    }
-
-    @Override
-    public Optional<Member> updatePassword(Long memberId, String newPassword) {
-        Member member = repository.get(memberId);
-        if (member == null) {
-            return Optional.empty();
-        }
-        member.setPassword(newPassword);
-        return Optional.of(member);
-    }
-
-    @Override
-    public Optional<Member> updateEmail(Long memberId, String newEmail) {
-        Member member = repository.get(memberId);
-        if (member == null) {
-            return Optional.empty();
-        }
-        member.setEmail(newEmail);
-        return Optional.of(member);
-    }
-
-    @Override
-    public Optional<Member> updateNickname(Long memberId, String newNickname) {
-        Member member = repository.get(memberId);
-        if (member == null) {
-            return Optional.empty();
-        }
-        member.setNickname(newNickname);
-        return Optional.of(member);
     }
 
     @Override
