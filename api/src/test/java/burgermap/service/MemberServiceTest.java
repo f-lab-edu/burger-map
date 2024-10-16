@@ -192,10 +192,7 @@ class MemberServiceTest {
         member.setPassword("oldPassword");
         String newPassword = "newPassword";
 
-        Mockito.when(memberRepository.updatePassword(memberId, newPassword)).then(invocation -> {
-            member.setPassword(newPassword);
-            return Optional.of(member);
-        });
+        Mockito.when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
         Member result = memberService.changePassword(memberId, newPassword);
 
         assertThat(result.getPassword()).isEqualTo(newPassword);
@@ -212,10 +209,7 @@ class MemberServiceTest {
         member.setEmail("old@gmail.com");
         String newEmail = "new@gmail.com";
 
-        Mockito.when(memberRepository.updateEmail(memberId, newEmail)).then(invocation -> {
-            member.setEmail(newEmail);
-            return Optional.of(member);
-        });
+        Mockito.when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
         Member result = memberService.changeEmail(memberId, newEmail);
 
         assertThat(result.getEmail()).isEqualTo(newEmail);
@@ -232,10 +226,7 @@ class MemberServiceTest {
         member.setNickname("oldNickname");
         String newNickname = "newNickname";
 
-        Mockito.when(memberRepository.updateNickname(memberId, newNickname)).then(invocation -> {
-            member.setNickname(newNickname);
-            return Optional.of(member);
-        });
+        Mockito.when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
         Member result = memberService.changeNickname(memberId, newNickname);
 
         assertThat(result.getNickname()).isEqualTo(newNickname);
