@@ -2,6 +2,7 @@ package burgermap.service;
 
 import burgermap.entity.Member;
 import burgermap.enums.MemberType;
+import burgermap.exception.member.MemberNotExistException;
 import burgermap.exception.store.NotOwnerMemberException;
 import burgermap.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -60,44 +61,49 @@ public class MemberService {
     }
 
     public Member getMyInfo(Long memberId) {
-        Member member = repository.findByMemberId(memberId).get();
+        Member member = repository.findByMemberId(memberId)
+                .orElseThrow(() -> new MemberNotExistException(memberId));
         log.debug("member info: {}", member);
         return member;
     }
 
     public Member changePassword(Long memberId, String newPassword) {
-        // 로그인이 필요하므로 회원 조회 결과가 존재
-        Member member = repository.findByMemberId(memberId).get();
+        Member member = repository.findByMemberId(memberId)
+                .orElseThrow(() -> new MemberNotExistException(memberId));
         member.setPassword(newPassword);
         log.debug("member password changed: {}", member);
         return member;
     }
 
     public Member changeEmail(Long memberId, String newEmail) {
-        Member member = repository.findByMemberId(memberId).get();
+        Member member = repository.findByMemberId(memberId)
+                .orElseThrow(() -> new MemberNotExistException(memberId));
         member.setEmail(newEmail);
         log.debug("member email changed: {}", member);
         return member;
     }
 
     public Member changeNickname(Long memberId, String newNickname) {
-        Member member = repository.findByMemberId(memberId).get();
+        Member member = repository.findByMemberId(memberId)
+                .orElseThrow(() -> new MemberNotExistException(memberId));
         member.setNickname(newNickname);
         log.debug("member nickname changed: {}", member);
         return member;
     }
 
     public Member deleteMember(Long memberId) {
-        Optional<Member> member = repository.deleteByMemberId(memberId);
-        log.debug("member deleted: {}", member.get());
-        return member.get();
+        Member member = repository.deleteByMemberId(memberId)
+                .orElseThrow(() -> new MemberNotExistException(memberId));;
+        log.debug("member deleted: {}", member);
+        return member;
     }
 
     /**
      * memberId에 해당하는 회원이 OWNER가 아니면 NotOwnerMemberException을 발생시킴
      */
     public void isMemberTypeOwner(Long memberId) {
-        Member member = repository.findByMemberId(memberId).get();
+        Member member = repository.findByMemberId(memberId)
+                .orElseThrow(() -> new MemberNotExistException(memberId));
         if (member.getMemberType() != MemberType.OWNER) {
             throw new NotOwnerMemberException("member type is not OWNER.");
         }
