@@ -40,8 +40,8 @@ public class MySqlMemberRepository implements MemberRepository {
 
     @Override
     public Optional<Member> deleteByMemberId(Long memberId) {
-        Member member = repository.findById(memberId).orElseThrow();
+        Optional<Member> member = repository.findById(memberId);
         repository.deleteById(memberId);
-        return Optional.of(member);
+        return member;
     }
 }

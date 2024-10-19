@@ -1,6 +1,7 @@
 package burgermap.service;
 
 import burgermap.entity.Store;
+import burgermap.exception.member.MemberNotExistException;
 import burgermap.exception.store.NotOwnerMemberException;
 import burgermap.exception.store.StoreNotExistException;
 import burgermap.repository.MemberRepository;
@@ -25,13 +26,15 @@ public class StoreService {
 
     public void addStore(Store store, Long memberId) {
         memberService.isMemberTypeOwner(memberId);
-        store.setMember(memberRepository.findByMemberId(memberId).orElseThrow());
+        store.setMember(memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new MemberNotExistException(memberId)));
         storeRepository.save(store);
         log.debug("store added: {}", store);
     }
 
     public Store getStore(Long storeId) {
-        Store store = storeRepository.findByStoreId(storeId).orElseThrow(() -> new StoreNotExistException(storeId));
+        Store store = storeRepository.findByStoreId(storeId)
+                .orElseThrow(() -> new StoreNotExistException(storeId));
         log.debug("store info: {}", store);
         return store;
     }
@@ -58,22 +61,20 @@ public class StoreService {
 
     public Store deleteStore(Long requestMemberId, Long storeId) {
         memberService.isMemberTypeOwner(requestMemberId);
-        Store oldStore = checkStoreExistence(storeId);
-        checkStoreBelongTo(oldStore, requestMemberId);
+        Store store = checkStoreExistence(storeId);
+        checkStoreBelongTo(store, requestMemberId);
 
-        Optional<Store> deletedStore = storeRepository.deleteByStoreId(storeId);
-        return deletedStore.orElse(null);
+        storeRepository.deleteByStoreId(storeId);
+        log.debug("store deleted: {}", store);
+        return store;
     }
 
     /**
      * storeId에 해당하는 가게가 존재하지 않으면 StoreNotExistException을 발생시킴
      */
     public Store checkStoreExistence(Long storeId) {
-        Store store = storeRepository.findByStoreId(storeId).orElse(null);
-        if (store == null) {
-            throw new StoreNotExistException(storeId);
-        }
-        return store;
+        return storeRepository.findByStoreId(storeId)
+                .orElseThrow(() -> new StoreNotExistException(storeId));
     }
 
     /**
