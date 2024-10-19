@@ -60,11 +60,12 @@ public class StoreService {
 
     public Store deleteStore(Long requestMemberId, Long storeId) {
         memberService.isMemberTypeOwner(requestMemberId);
-        Store oldStore = checkStoreExistence(storeId);
-        checkStoreBelongTo(oldStore, requestMemberId);
+        Store store = checkStoreExistence(storeId);
+        checkStoreBelongTo(store, requestMemberId);
 
-        Optional<Store> deletedStore = storeRepository.deleteByStoreId(storeId);
-        return deletedStore.orElse(null);
+        storeRepository.deleteByStoreId(storeId);
+        log.debug("store deleted: {}", store);
+        return store;
     }
 
     /**
