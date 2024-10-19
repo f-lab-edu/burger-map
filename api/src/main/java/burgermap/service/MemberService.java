@@ -51,13 +51,18 @@ public class MemberService {
 
     public Member login(String loginId, String password) {
         Optional<Member> member = repository.findByLoginId(loginId);
-        log.debug("login member : {}", member.orElse(null));
         // 로그인 실패: loginId를 가진 회원이 존재하지 않는 경우, 회원은 존재하되 pw가 다른 경우
-        if (member.isEmpty() || !member.get().getPassword().equals(password)) {
-            log.debug("login failed");
-            return null;
+        if (member.isPresent()) {
+            log.debug("login member : {}", member.get());
+            if (member.get().getPassword().equals(password)) {
+                return member.get();
+            } else {
+                log.debug("login fail: incorrect password");
+                return null;
+            }
         }
-        return member.get();
+        log.debug("login fail: member not found (loginId: {})", loginId);
+        return null;
     }
 
     public Member getMyInfo(Long memberId) {
