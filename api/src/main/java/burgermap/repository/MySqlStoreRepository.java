@@ -31,8 +31,8 @@ public class MySqlStoreRepository implements StoreRepository {
 
     @Override
     public Optional<Store> deleteByStoreId(Long storeId) {
-        Store store = repository.findById(storeId).get();
-        repository.delete(store);
-        return Optional.of(store);
+        Optional<Store> store = repository.findById(storeId);
+        repository.deleteById(storeId);
+        return store;
     }
 }
