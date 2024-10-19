@@ -22,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -54,26 +56,29 @@ public class FoodService {
         Store store = storeService.checkStoreExistence(storeId);
         storeService.checkStoreBelongTo(store, memberId);
 
+        food.setStore(store);
+
         return foodRepository.save(food);
     }
 
     public List<Ingredient> ingredientIdsToIngredients(List<Long> ingredientIds) {
-        List<Optional<Ingredient>> ingredientList = ingredientIds.stream()
-                .map(ingredientRepository::findByIngredientId)
-                .toList();
+        // ingredientId, Optional<Ingredient> 맵으로 변환
+        Map<Long, Optional<Ingredient>> ingredientMap = ingredientIds.stream()
+                .collect(Collectors.toMap(ingredientId -> ingredientId, ingredientRepository::findByIngredientId));
 
-        List<String> notExistIngredientIds = Stream.iterate(0, i -> i + 1)
-                .limit(ingredientIds.size())
-                .filter(i -> ingredientList.get(i).isEmpty())
-                .map(i -> String.valueOf(ingredientIds.get(i)))
-                .toList();
+        // value가 empty인 ingredientId 수집
+        List<Long> notExistIngredientIdsList = ingredientMap.entrySet().stream()
+                .filter(entry -> entry.getValue().isEmpty())
+                .map(Map.Entry::getKey).toList();
 
-        if (!notExistIngredientIds.isEmpty()) {
-            String notExistIngredientIdsString = String.join(", ", notExistIngredientIds);
-            throw new FoodAttributeNotExistException("Ingredients Id %s does not exist".formatted(notExistIngredientIdsString));
+        if (!notExistIngredientIdsList.isEmpty()) {
+            String notExistIngredientIds = notExistIngredientIdsList.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(", "));
+            log.debug("Ingredients Id {} does not exist", notExistIngredientIds);
+            throw new FoodAttributeNotExistException("Ingredients Id %s does not exist".formatted(notExistIngredientIds));
         }
-
-        return ingredientList.stream().map(Optional::get).toList();
+        return ingredientMap.values().stream().map(Optional::get).toList();
     }
 
     public MenuCategory menuCategoryIdToMenuCategory(Long menuCategoryId) {
