@@ -71,11 +71,8 @@ public class StoreService {
      * storeId에 해당하는 가게가 존재하지 않으면 StoreNotExistException을 발생시킴
      */
     public Store checkStoreExistence(Long storeId) {
-        Store store = storeRepository.findByStoreId(storeId).orElse(null);
-        if (store == null) {
-            throw new StoreNotExistException(storeId);
-        }
-        return store;
+        return storeRepository.findByStoreId(storeId)
+                .orElseThrow(() -> new StoreNotExistException(storeId));
     }
 
     /**
