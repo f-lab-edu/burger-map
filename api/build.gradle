@@ -5,6 +5,10 @@ plugins {
 dependencies {
     implementation project(':core')
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    implementation(platform('software.amazon.awssdk:bom:2.28.26'))
+    implementation 'software.amazon.awssdk:s3'
+
     runtimeOnly 'com.mysql:mysql-connector-j'
 
     testImplementation 'org.testcontainers:testcontainers'
