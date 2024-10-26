@@ -37,6 +37,9 @@ public class ImageService {
 
     private S3Presigner s3Presigner;
 
+    /**
+     * 초기화 메서드 - AWS S3 Presigner 객체 생성
+     */
     @PostConstruct
     public void init() {
         StaticCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(
@@ -50,6 +53,13 @@ public class ImageService {
                 .build();
     }
 
+    /**
+     * 이미지 업로드를 위한 presigned URL 생성
+     *
+     * @param imageCategory 이미지 카테고리 (회원 프로필, 가게 소개 이미지, 음식 이미지, 리뷰 첨부 이미지)
+     * @param fileName      업로드 이미지 파일명
+     * @return presigned URL
+     */
     public String createPresignedUploadUrl(ImageCategory imageCategory, String fileName) {
         log.debug("presigned URL request: {} - {}", imageCategory, fileName);
 
