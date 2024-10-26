@@ -8,11 +8,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MemberJoinRequestDto {
+public class MemberJoinResponseDto {
     private MemberType memberType;
     private String loginId;
-    private String password;
     private String email;
     private String nickname;
-    private String profileImageName;
+    private String profileImageUploadUrl;
 }
