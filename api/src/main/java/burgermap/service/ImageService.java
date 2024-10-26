@@ -127,7 +127,10 @@ public class ImageService {
      * @param imageName     이미지 파일명
      * @return 생성된 이미지 URL
      */
-    public String getImageUrl(ImageCategory imageCategory, String imageName) {
-        return String.join("/", endpoint, bucket, imageCategory.getDirectory(), imageName);
+    public Optional<String> getImageUrl(ImageCategory imageCategory, String imageName) {
+        if (imageName == null) {
+            return Optional.empty();
+        }
+        return Optional.of(String.join("/", endpoint, bucket, imageCategory.getDirectory(), imageName));
     }
 }
