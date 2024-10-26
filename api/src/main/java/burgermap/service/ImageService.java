@@ -1,8 +1,7 @@
 package burgermap.service;
 
+import burgermap.enums.ImageCategory;
 import jakarta.annotation.PostConstruct;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -101,16 +100,5 @@ public class ImageService {
         String directory = imageCategory.getDirectory();
 
         return "%s/%s%s".formatted(directory, UUID.randomUUID().toString(), fileExt);
-    }
-
-    @Getter
-    @RequiredArgsConstructor
-    public static enum ImageCategory {
-        MEMBER_PROFILE_IMAGE("profile-images"),
-        STORE_IMAGE("store-images"),
-        FOOD_IMAGE("food-images"),
-        REVIEW_IMAGE("review-images");
-
-        private final String directory;
     }
 }
