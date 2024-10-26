@@ -1,5 +1,6 @@
 package burgermap.service;
 
+import burgermap.dto.image.ImageUploadUrlDto;
 import burgermap.enums.ImageCategory;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -59,10 +60,11 @@ public class ImageService {
      * @param fileName      업로드 이미지 파일명
      * @return presigned URL
      */
-    public String createPresignedUploadUrl(ImageCategory imageCategory, String fileName) {
+    public ImageUploadUrlDto createPresignedUploadUrl(ImageCategory imageCategory, String fileName) {
         log.debug("presigned URL request: {} - {}", imageCategory, fileName);
 
-        String imageUploadPath = generateImageName(imageCategory, fileName);
+        String imageUploadName = generateImageName(fileName);
+        String imageUploadPath = generateImagePath(imageCategory, imageUploadName);
 
         // ACL 설정 - 업로드한 이미지를 공개 설정
         // PutObjectRequest.builder().acl() 메서드는 presigned URL 생성 시 동작하지 않음.
@@ -85,20 +87,31 @@ public class ImageService {
         PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(presignRequest);
         log.debug("presigned URL: {}", presignedRequest.url().toString());
 
-        return presignedRequest.url().toString();
+        return new ImageUploadUrlDto(presignedRequest.url().toString(), imageUploadName);
     }
 
     /**
-     * 이미지 파일명 생성
+     * 이미지 파일명 생성 - 익명화 처리 위해 새로운 파일명 생성
      *
-     * @param imageCategory 이미지 카테고리
-     * @param fileName      업로드 이미지 파일명
+     * @param fileName 업로드 이미지 파일명
      * @return 생성된 이미지 파일명
      */
-    private String generateImageName(ImageCategory imageCategory, String fileName) {
+    private String generateImageName(String fileName) {
         String fileExt = fileName.substring(fileName.lastIndexOf("."));
+
+        return UUID.randomUUID() + fileExt;
+    }
+
+    /**
+     * 이미지 업로드 경로 생성
+     *
+     * @param imageCategory 이미지 카테고리
+     * @param imageName     이미지 파일명
+     * @return 생성된 이미지 경로
+     */
+    private String generateImagePath(ImageCategory imageCategory, String imageName) {
         String directory = imageCategory.getDirectory();
 
-        return "%s/%s%s".formatted(directory, UUID.randomUUID().toString(), fileExt);
+        return String.join("/", directory, imageName);
     }
 }
