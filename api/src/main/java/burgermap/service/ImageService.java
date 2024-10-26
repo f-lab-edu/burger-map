@@ -114,4 +114,15 @@ public class ImageService {
 
         return String.join("/", directory, imageName);
     }
+
+    /**
+     * 이미지 파일명과 카테고리로부터 이미지 URL 생성
+     *
+     * @param imageCategory 이미지 카테고리
+     * @param imageName     이미지 파일명
+     * @return 생성된 이미지 URL
+     */
+    public String getImageUrl(ImageCategory imageCategory, String imageName) {
+        return String.join("/", endpoint, bucket, imageCategory.getDirectory(), imageName);
+    }
 }
