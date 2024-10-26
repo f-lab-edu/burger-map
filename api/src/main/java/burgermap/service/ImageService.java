@@ -52,10 +52,8 @@ public class ImageService {
 
     public String createPresignedUploadUrl(ImageCategory imageCategory, String fileName) {
         log.debug("presigned URL request: {} - {}", imageCategory, fileName);
-        String fileExt = fileName.substring(fileName.lastIndexOf("."));
-        String directory = imageCategory.getDirectory();
 
-        String uploadImagePath = "%s/%s%s".formatted(directory, UUID.randomUUID().toString(), fileExt);
+        String imageUploadPath = generateImageName(imageCategory, fileName);
 
         // ACL 설정 - 업로드한 이미지를 공개 설정
         // PutObjectRequest.builder().acl() 메서드는 presigned URL 생성 시 동작하지 않음.
@@ -66,7 +64,7 @@ public class ImageService {
         // 업로드할 이미지 정보를 담은 요청 객체 생성
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucket)
-                .key(uploadImagePath)
+                .key(imageUploadPath)
                 .overrideConfiguration(overrideConfig)
                 .build();
         // 생성할 URL의 특성 설정
@@ -79,6 +77,20 @@ public class ImageService {
         log.debug("presigned URL: {}", presignedRequest.url().toString());
 
         return presignedRequest.url().toString();
+    }
+
+    /**
+     * 이미지 파일명 생성
+     *
+     * @param imageCategory 이미지 카테고리
+     * @param fileName      업로드 이미지 파일명
+     * @return 생성된 이미지 파일명
+     */
+    private String generateImageName(ImageCategory imageCategory, String fileName) {
+        String fileExt = fileName.substring(fileName.lastIndexOf("."));
+        String directory = imageCategory.getDirectory();
+
+        return "%s/%s%s".formatted(directory, UUID.randomUUID().toString(), fileExt);
     }
 
     @Getter
