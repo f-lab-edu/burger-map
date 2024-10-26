@@ -192,6 +192,9 @@ public class MemberController {
         memberInfoDto.setLoginId(member.getLoginId());
         memberInfoDto.setEmail(member.getEmail());
         memberInfoDto.setNickname(member.getNickname());
+        String profileImageUrl = imageService.getImageUrl(
+                ImageCategory.MEMBER_PROFILE_IMAGE, member.getProfileImageName()).orElse(null);
+        memberInfoDto.setProfileImageUrl(profileImageUrl);
         return memberInfoDto;
     }
 
