@@ -1,11 +1,15 @@
 package burgermap.controller;
 
 import burgermap.annotation.CheckLogin;
+import burgermap.dto.image.ImageUploadUrlDto;
 import burgermap.dto.member.MemberChangeableInfoDto;
 import burgermap.dto.member.MemberInfoDto;
 import burgermap.dto.member.MemberJoinRequestDto;
+import burgermap.dto.member.MemberJoinResponseDto;
 import burgermap.dto.member.MemberLoginDto;
 import burgermap.entity.Member;
+import burgermap.enums.ImageCategory;
+import burgermap.service.ImageService;
 import burgermap.service.MemberService;
 import burgermap.session.SessionConstants;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,15 +38,19 @@ import java.util.Map;
 public class MemberController {
 
     private final MemberService memberService;
+    private final ImageService imageService;
 
     /**
      * 회원 추가
      */
     @PostMapping
-    public MemberInfoDto addMember(@RequestBody MemberJoinRequestDto memberJoinRequestDto) {
-        Member member = cvtToMember(memberJoinRequestDto);
+    public MemberJoinResponseDto addMember(@RequestBody MemberJoinRequestDto memberJoinRequestDto) {
+        // 새로운 이미지 파일명 생성 및 이미지 업로드 URL 생성
+        ImageUploadUrlDto presignedUploadUrl = imageService.createPresignedUploadUrl(
+                ImageCategory.MEMBER_PROFILE_IMAGE, memberJoinRequestDto.getProfileImageName());
+        Member member = cvtToMember(memberJoinRequestDto, presignedUploadUrl.getImageName());
         memberService.addMember(member);
-        return cvtToMemberInfoDto(member);
+        return cvtToMemberJoinResponseDto(member, presignedUploadUrl.getImageUploadUrl());
     }
 
     /**
@@ -157,7 +165,7 @@ public class MemberController {
         return ResponseEntity.ok(cvtToMemberInfoDto(deletedMember));
     }
 
-    private Member cvtToMember(Object memberDto) {
+    private Member cvtToMember(Object memberDto, String profileImageName) {
         Member member = new Member();
 
         if (memberDto instanceof MemberJoinRequestDto memberJoinRequestDto) {
@@ -166,6 +174,7 @@ public class MemberController {
             member.setPassword(memberJoinRequestDto.getPassword());
             member.setEmail(memberJoinRequestDto.getEmail());
             member.setNickname(memberJoinRequestDto.getNickname());
+            member.setProfileImageName(profileImageName);
         }
 
         return member;
@@ -178,5 +187,15 @@ public class MemberController {
         memberInfoDto.setEmail(member.getEmail());
         memberInfoDto.setNickname(member.getNickname());
         return memberInfoDto;
+    }
+
+    private MemberJoinResponseDto cvtToMemberJoinResponseDto(Member member, String profileImageUploadUrl) {
+        MemberJoinResponseDto memberJoinResponseDto = new MemberJoinResponseDto();
+        memberJoinResponseDto.setMemberType(member.getMemberType());
+        memberJoinResponseDto.setLoginId(member.getLoginId());
+        memberJoinResponseDto.setEmail(member.getEmail());
+        memberJoinResponseDto.setNickname(member.getNickname());
+        memberJoinResponseDto.setProfileImageUploadUrl(profileImageUploadUrl);
+        return memberJoinResponseDto;
     }
 }
