@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import java.util.Map;
+import java.util.Optional;
 
 
 @Slf4j
@@ -46,11 +47,16 @@ public class MemberController {
     @PostMapping
     public MemberJoinResponseDto addMember(@RequestBody MemberJoinRequestDto memberJoinRequestDto) {
         // 새로운 이미지 파일명 생성 및 이미지 업로드 URL 생성
-        ImageUploadUrlDto presignedUploadUrl = imageService.createPresignedUploadUrl(
-                ImageCategory.MEMBER_PROFILE_IMAGE, memberJoinRequestDto.getProfileImageName());
-        Member member = cvtToMember(memberJoinRequestDto, presignedUploadUrl.getImageName());
+        Optional<ImageUploadUrlDto> presignedUploadUrl = imageService.createPresignedUploadUrl(
+                ImageCategory.MEMBER_PROFILE_IMAGE,
+                memberJoinRequestDto.getProfileImageName());
+        Member member = cvtToMember(
+                memberJoinRequestDto,
+                presignedUploadUrl.map(ImageUploadUrlDto::getImageName).orElse(null));
         memberService.addMember(member);
-        return cvtToMemberJoinResponseDto(member, presignedUploadUrl.getImageUploadUrl());
+        return cvtToMemberJoinResponseDto(
+                member,
+                presignedUploadUrl.map(ImageUploadUrlDto::getImageUploadUrl).orElse(null));
     }
 
     /**

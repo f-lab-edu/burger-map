@@ -18,6 +18,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 
 import java.net.URI;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -54,14 +55,18 @@ public class ImageService {
     }
 
     /**
-     * 이미지 업로드를 위한 presigned URL 생성
+     * 이미지 업로드 URL 생성
+     * 이미지를 업로드하지 않는 경우 Optional.empty 반환
      *
-     * @param imageCategory 이미지 카테고리 (회원 프로필, 가게 소개 이미지, 음식 이미지, 리뷰 첨부 이미지)
-     * @param fileName      업로드 이미지 파일명
-     * @return presigned URL
+     * @param imageCategory 이미지 카테고리
+     * @param fileName      업로드할 이미지 파일명
+     * @return 생성된 이미지 업로드 URL, 이미지 파일명
      */
-    public ImageUploadUrlDto createPresignedUploadUrl(ImageCategory imageCategory, String fileName) {
+    public Optional<ImageUploadUrlDto> createPresignedUploadUrl(ImageCategory imageCategory, String fileName) {
         log.debug("presigned URL request: {} - {}", imageCategory, fileName);
+        if (fileName == null) {
+            return Optional.empty();
+        }
 
         String imageUploadName = generateImageName(fileName);
         String imageUploadPath = generateImagePath(imageCategory, imageUploadName);
@@ -87,7 +92,7 @@ public class ImageService {
         PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(presignRequest);
         log.debug("presigned URL: {}", presignedRequest.url().toString());
 
-        return new ImageUploadUrlDto(presignedRequest.url().toString(), imageUploadName);
+        return Optional.of(new ImageUploadUrlDto(presignedRequest.url().toString(), imageUploadName));
     }
 
     /**
