@@ -23,7 +23,7 @@ public class HashMapFoodRepository implements FoodRepository{
     @Override
     public List<Food> findByStoreId(Long storeId) {
         return repository.values().stream()
-                .filter(food -> food.getStoreId().equals(storeId))
+                .filter(food -> food.getStore().getStoreId().equals(storeId))
                 .toList();
     }
 }

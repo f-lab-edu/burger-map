@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
-@Repository
+//@Repository
 public class HashMapStoreRepository implements StoreRepository{
 
     private final Map<Long, Store> repository = new ConcurrentHashMap<>();
@@ -31,21 +31,9 @@ public class HashMapStoreRepository implements StoreRepository{
     @Override
     public List<Store> findByMemberId(Long memberId) {
         List<Store> stores = repository.values().stream()
-                .filter(store -> store.getMemberId().equals(memberId))
+                .filter(store -> store.getMember().getMemberId().equals(memberId))
                 .toList();
         return stores;
-    }
-
-    @Override
-    public Optional<Store> updateStore(Long storeId, Store newStore) {
-        Store oldStore = repository.get(storeId);
-        if (oldStore == null) {
-            return Optional.empty();
-        }
-
-        newStore.setStoreId(storeId);
-        repository.put(storeId, newStore);
-        return Optional.of(newStore);
     }
 
     @Override
