@@ -18,8 +18,11 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 
 import java.net.URI;
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -93,6 +96,19 @@ public class ImageService {
         log.debug("presigned URL: {}", presignedRequest.url().toString());
 
         return Optional.of(new ImageUploadUrlDto(presignedRequest.url().toString(), imageUploadName));
+    }
+
+    /**
+     * 다수의 이미지 업로드 URL 생성
+     * @param imageCategory
+     * @param fileNames
+     * @return 파일 원본 이름, (생성된 이미지 업로드 URL, 이미지 파일명) Map
+     */
+    public Map<String, ImageUploadUrlDto> createPresignedUploadUrls(ImageCategory imageCategory, List<String> fileNames) {
+        return fileNames.stream()
+                .map(fileName -> Map.entry(fileName, createPresignedUploadUrl(imageCategory, fileName)))
+                .filter(entry -> entry.getValue().isPresent())
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()));
     }
 
     /**
