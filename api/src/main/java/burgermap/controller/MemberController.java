@@ -8,7 +8,6 @@ import burgermap.dto.member.MemberJoinRequestDto;
 import burgermap.dto.member.MemberJoinResponseDto;
 import burgermap.dto.member.MemberLoginDto;
 import burgermap.entity.Member;
-import burgermap.enums.ImageCategory;
 import burgermap.service.ImageService;
 import burgermap.service.MemberService;
 import burgermap.session.SessionConstants;
@@ -37,9 +36,11 @@ import java.util.Optional;
 @RestController
 @RequestMapping("members")
 public class MemberController {
+    private static final String IMAGE_DIRECTORY_PATH = "profile-images";
 
     private final MemberService memberService;
     private final ImageService imageService;
+
 
     /**
      * 회원 추가
@@ -48,7 +49,7 @@ public class MemberController {
     public MemberJoinResponseDto addMember(@RequestBody MemberJoinRequestDto memberJoinRequestDto) {
         // 새로운 이미지 파일명 생성 및 이미지 업로드 URL 생성
         Optional<ImageUploadUrlDto> presignedUploadUrl = imageService.createPresignedUploadUrl(
-                ImageCategory.MEMBER_PROFILE_IMAGE,
+                IMAGE_DIRECTORY_PATH,
                 memberJoinRequestDto.getProfileImageName());
         Member member = cvtToMember(
                 memberJoinRequestDto,
@@ -193,7 +194,7 @@ public class MemberController {
         memberInfoDto.setEmail(member.getEmail());
         memberInfoDto.setNickname(member.getNickname());
         String profileImageUrl = imageService.getImageUrl(
-                ImageCategory.MEMBER_PROFILE_IMAGE, member.getProfileImageName()).orElse(null);
+                IMAGE_DIRECTORY_PATH, member.getProfileImageName()).orElse(null);
         memberInfoDto.setProfileImageUrl(profileImageUrl);
         return memberInfoDto;
     }

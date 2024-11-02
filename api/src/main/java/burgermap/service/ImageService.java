@@ -1,7 +1,6 @@
 package burgermap.service;
 
 import burgermap.dto.image.ImageUploadUrlDto;
-import burgermap.enums.ImageCategory;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,18 +60,18 @@ public class ImageService {
      * 이미지 업로드 URL 생성
      * 이미지를 업로드하지 않는 경우 Optional.empty 반환
      *
-     * @param imageCategory 이미지 카테고리
+     * @param imageUploadDirectory 이미지 업로드 디렉토리
      * @param fileName      업로드할 이미지 파일명
      * @return 생성된 이미지 업로드 URL, 이미지 파일명
      */
-    public Optional<ImageUploadUrlDto> createPresignedUploadUrl(ImageCategory imageCategory, String fileName) {
-        log.debug("presigned URL request: {} - {}", imageCategory, fileName);
+    public Optional<ImageUploadUrlDto> createPresignedUploadUrl(String imageUploadDirectory, String fileName) {
+        log.debug("presigned URL request: {} - {}", imageUploadDirectory, fileName);
         if (fileName == null) {
             return Optional.empty();
         }
 
         String imageUploadName = generateImageName(fileName);
-        String imageUploadPath = generateImagePath(imageCategory, imageUploadName);
+        String imageUploadPath = String.join("/", imageUploadDirectory, imageUploadName);
 
         // ACL 설정 - 업로드한 이미지를 공개 설정
         // PutObjectRequest.builder().acl() 메서드는 presigned URL 생성 시 동작하지 않음.
@@ -100,13 +99,13 @@ public class ImageService {
 
     /**
      * 다수의 이미지 업로드 URL 생성
-     * @param imageCategory
-     * @param fileNames
+     * @param imageUploadDirectory 이미지 업로드 디렉토리
+     * @param fileNames 업로드 이미지 파일명 리스트
      * @return 파일 원본 이름, (생성된 이미지 업로드 URL, 이미지 파일명) Map
      */
-    public Map<String, ImageUploadUrlDto> createPresignedUploadUrls(ImageCategory imageCategory, List<String> fileNames) {
+    public Map<String, ImageUploadUrlDto> createPresignedUploadUrls(String imageUploadDirectory, List<String> fileNames) {
         return fileNames.stream()
-                .map(fileName -> Map.entry(fileName, createPresignedUploadUrl(imageCategory, fileName)))
+                .map(fileName -> Map.entry(fileName, createPresignedUploadUrl(imageUploadDirectory, fileName)))
                 .filter(entry -> entry.getValue().isPresent())
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()));
     }
@@ -124,29 +123,16 @@ public class ImageService {
     }
 
     /**
-     * 이미지 업로드 경로 생성
-     *
-     * @param imageCategory 이미지 카테고리
-     * @param imageName     이미지 파일명
-     * @return 생성된 이미지 경로
-     */
-    private String generateImagePath(ImageCategory imageCategory, String imageName) {
-        String directory = imageCategory.getDirectory();
-
-        return String.join("/", directory, imageName);
-    }
-
-    /**
      * 이미지 파일명과 카테고리로부터 이미지 URL 생성
      *
-     * @param imageCategory 이미지 카테고리
+     * @param imageDirectory 이미지 업로드 디렉토리
      * @param imageName     이미지 파일명
      * @return 생성된 이미지 URL
      */
-    public Optional<String> getImageUrl(ImageCategory imageCategory, String imageName) {
+    public Optional<String> getImageUrl(String imageDirectory, String imageName) {
         if (imageName == null) {
             return Optional.empty();
         }
-        return Optional.of(String.join("/", endpoint, bucket, imageCategory.getDirectory(), imageName));
+        return Optional.of(String.join("/", endpoint, bucket, imageDirectory, imageName));
     }
 }
