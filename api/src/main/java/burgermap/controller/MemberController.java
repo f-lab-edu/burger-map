@@ -148,6 +148,13 @@ public class MemberController {
         return ResponseEntity.ok(cvtToMemberInfoDto(member));
     }
 
+    @CheckLogin
+    @PatchMapping("/my-info/profile-image")
+    public ResponseEntity<MemberInfoDto> changeProfileImage(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId, @RequestBody MemberChangeableInfoDto memberChangeableInfoDto) {
+        Member member = memberService.changeProfileImage(memberId, memberChangeableInfoDto.getProfileImageName());
+        return ResponseEntity.ok(cvtToMemberInfoDto(member));
+    }
+
     /**
      * 닉네임 변경
      * 로그인한 회원이 자신의 닉네임을 변경

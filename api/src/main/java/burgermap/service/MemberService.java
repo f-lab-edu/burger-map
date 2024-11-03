@@ -102,6 +102,20 @@ public class MemberService {
         return member;
     }
 
+    public Member changeProfileImage(Long memberId, String profileImageName) {
+        Member member = repository.findByMemberId(memberId)
+                .orElseThrow(() -> new MemberNotExistException(memberId));
+        if (profileImageName == null) {  // 프로필 이미지 삭제
+            member.setProfileImage(null);
+        } else {
+            member.getProfileImage().setInUse(false);  // 기존 이미지 미사용 처리
+            Image newProfileImage = new Image();  // 새 이미지 등록
+            newProfileImage.setImageName(profileImageName);
+            member.setProfileImage(newProfileImage);
+        }
+        return member;
+    }
+
     public Member deleteMember(Long memberId) {
         Member member = repository.deleteByMemberId(memberId)
                 .orElseThrow(() -> new MemberNotExistException(memberId));;
