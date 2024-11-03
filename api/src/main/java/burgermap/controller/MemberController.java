@@ -49,7 +49,7 @@ public class MemberController {
     @PostMapping
     public MemberJoinResponseDto addMember(@RequestBody MemberJoinRequestDto memberJoinRequestDto) {
         Member member = cvtToMember(memberJoinRequestDto);
-        memberService.addMember(member);
+        memberService.addMember(member, memberJoinRequestDto.getProfileImageName());
         return cvtToMemberJoinResponseDto(member);
     }
 
@@ -182,7 +182,6 @@ public class MemberController {
             member.setPassword(memberJoinRequestDto.getPassword());
             member.setEmail(memberJoinRequestDto.getEmail());
             member.setNickname(memberJoinRequestDto.getNickname());
-            member.setProfileImageName(memberJoinRequestDto.getProfileImageName());
         }
 
         return member;
@@ -194,9 +193,12 @@ public class MemberController {
         memberInfoDto.setLoginId(member.getLoginId());
         memberInfoDto.setEmail(member.getEmail());
         memberInfoDto.setNickname(member.getNickname());
-        String profileImageUrl = imageService.getImageUrl(
-                IMAGE_DIRECTORY_PATH, member.getProfileImageName()).orElse(null);
-        memberInfoDto.setProfileImageUrl(profileImageUrl);
+
+        if (member.getProfileImage() != null) {
+            String profileImageUrl = imageService.getImageUrl(
+                    IMAGE_DIRECTORY_PATH, member.getProfileImage().getImageName()).orElse(null);
+            memberInfoDto.setProfileImageUrl(profileImageUrl);
+        }
         return memberInfoDto;
     }
 
@@ -206,9 +208,12 @@ public class MemberController {
         memberJoinResponseDto.setLoginId(member.getLoginId());
         memberJoinResponseDto.setEmail(member.getEmail());
         memberJoinResponseDto.setNickname(member.getNickname());
-        String profileImageUrl = imageService.getImageUrl(
-                IMAGE_DIRECTORY_PATH, member.getProfileImageName()).orElse(null);
-        memberJoinResponseDto.setProfileImageUrl(profileImageUrl);
+
+        if (member.getProfileImage() != null) {
+            String profileImageUrl = imageService.getImageUrl(
+                    IMAGE_DIRECTORY_PATH, member.getProfileImage().getImageName()).orElse(null);
+            memberJoinResponseDto.setProfileImageUrl(profileImageUrl);
+        }
         return memberJoinResponseDto;
     }
 }

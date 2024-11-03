@@ -1,5 +1,6 @@
 package burgermap.service;
 
+import burgermap.entity.Image;
 import burgermap.entity.Member;
 import burgermap.enums.MemberType;
 import burgermap.exception.member.MemberNotExistException;
@@ -20,7 +21,12 @@ public class MemberService {
 
     private final MemberRepository repository;
 
-    public void addMember(Member member) {
+    public void addMember(Member member, String profileImageName) {
+        if (profileImageName != null) {
+            Image profileImage = new Image();
+            profileImage.setImageName(profileImageName);
+            member.setProfileImage(profileImage);
+        }
         repository.save(member);
         log.debug("member added: {}", member);
     }
