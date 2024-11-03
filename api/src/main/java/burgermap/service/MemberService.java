@@ -108,7 +108,8 @@ public class MemberService {
         if (profileImageName == null) {  // 프로필 이미지 삭제
             member.setProfileImage(null);
         } else {
-            member.getProfileImage().setInUse(false);  // 기존 이미지 미사용 처리
+            if (member.getProfileImage() != null)
+                member.getProfileImage().setInUse(false);  // 기존 이미지 미사용 처리
             Image newProfileImage = new Image();  // 새 이미지 등록
             newProfileImage.setImageName(profileImageName);
             member.setProfileImage(newProfileImage);
