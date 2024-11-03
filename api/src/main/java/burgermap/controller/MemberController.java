@@ -48,17 +48,9 @@ public class MemberController {
      */
     @PostMapping
     public MemberJoinResponseDto addMember(@RequestBody MemberJoinRequestDto memberJoinRequestDto) {
-        // 새로운 이미지 파일명 생성 및 이미지 업로드 URL 생성
-        Optional<ImageUploadUrlDto> presignedUploadUrl = imageService.createPresignedUploadUrl(
-                IMAGE_DIRECTORY_PATH,
-                memberJoinRequestDto.getProfileImageName());
-        Member member = cvtToMember(
-                memberJoinRequestDto,
-                presignedUploadUrl.map(ImageUploadUrlDto::getImageName).orElse(null));
+        Member member = cvtToMember(memberJoinRequestDto);
         memberService.addMember(member);
-        return cvtToMemberJoinResponseDto(
-                member,
-                presignedUploadUrl.map(ImageUploadUrlDto::getImageUploadUrl).orElse(null));
+        return cvtToMemberJoinResponseDto(member);
     }
 
     @PostMapping("/image-upload-url")
@@ -181,7 +173,7 @@ public class MemberController {
         return ResponseEntity.ok(cvtToMemberInfoDto(deletedMember));
     }
 
-    private Member cvtToMember(Object memberDto, String profileImageName) {
+    private Member cvtToMember(Object memberDto) {
         Member member = new Member();
 
         if (memberDto instanceof MemberJoinRequestDto memberJoinRequestDto) {
@@ -190,7 +182,7 @@ public class MemberController {
             member.setPassword(memberJoinRequestDto.getPassword());
             member.setEmail(memberJoinRequestDto.getEmail());
             member.setNickname(memberJoinRequestDto.getNickname());
-            member.setProfileImageName(profileImageName);
+            member.setProfileImageName(memberJoinRequestDto.getProfileImageName());
         }
 
         return member;
@@ -208,13 +200,15 @@ public class MemberController {
         return memberInfoDto;
     }
 
-    private MemberJoinResponseDto cvtToMemberJoinResponseDto(Member member, String profileImageUploadUrl) {
+    private MemberJoinResponseDto cvtToMemberJoinResponseDto(Member member) {
         MemberJoinResponseDto memberJoinResponseDto = new MemberJoinResponseDto();
         memberJoinResponseDto.setMemberType(member.getMemberType());
         memberJoinResponseDto.setLoginId(member.getLoginId());
         memberJoinResponseDto.setEmail(member.getEmail());
         memberJoinResponseDto.setNickname(member.getNickname());
-        memberJoinResponseDto.setProfileImageUploadUrl(profileImageUploadUrl);
+        String profileImageUrl = imageService.getImageUrl(
+                IMAGE_DIRECTORY_PATH, member.getProfileImageName()).orElse(null);
+        memberJoinResponseDto.setProfileImageUrl(profileImageUrl);
         return memberJoinResponseDto;
     }
 }
