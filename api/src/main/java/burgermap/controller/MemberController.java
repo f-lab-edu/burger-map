@@ -1,6 +1,7 @@
 package burgermap.controller;
 
 import burgermap.annotation.CheckLogin;
+import burgermap.dto.image.ImageUploadRequestDto;
 import burgermap.dto.image.ImageUploadUrlDto;
 import burgermap.dto.member.MemberChangeableInfoDto;
 import burgermap.dto.member.MemberInfoDto;
@@ -58,6 +59,14 @@ public class MemberController {
         return cvtToMemberJoinResponseDto(
                 member,
                 presignedUploadUrl.map(ImageUploadUrlDto::getImageUploadUrl).orElse(null));
+    }
+
+    @PostMapping("/image-upload-url")
+    public ImageUploadUrlDto getImageUploadUrl(@RequestBody ImageUploadRequestDto imageUploadRequestDto) {
+        Optional<ImageUploadUrlDto> presignedUploadUrl = imageService.createPresignedUploadUrl(
+                IMAGE_DIRECTORY_PATH,
+                imageUploadRequestDto.getImageName());
+        return presignedUploadUrl.orElseThrow();
     }
 
     /**
