@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -12,6 +13,11 @@ import java.util.concurrent.atomic.AtomicLong;
 public class HashMapFoodRepository implements FoodRepository{
     private static final Map<Long, Food> repository = new ConcurrentHashMap<>();
     private final AtomicLong foodIdCount = new AtomicLong(0);
+
+    @Override
+    public Optional<Food> findByFoodId(Long foodId) {
+        return Optional.ofNullable(repository.get(foodId));
+    }
 
     @Override
     public Food save(Food food) {

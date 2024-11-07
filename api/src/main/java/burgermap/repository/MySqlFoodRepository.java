@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -18,6 +19,12 @@ public class MySqlFoodRepository implements FoodRepository{
     public Food save(Food food) {
         em.persist(food);
         return food;
+    }
+
+    @Override
+    public Optional<Food> findByFoodId(Long foodId) {
+        Food food = em.find(Food.class, foodId);
+        return Optional.ofNullable(food);
     }
 
     @Override
