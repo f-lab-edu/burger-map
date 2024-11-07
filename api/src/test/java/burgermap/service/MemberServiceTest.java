@@ -42,7 +42,7 @@ class MemberServiceTest {
             return newMember;
         });
 
-        memberService.addMember(newMember);
+        memberService.addMember(newMember, null);
 
         assertThat(newMember.getMemberId()).isNotNull();
     }

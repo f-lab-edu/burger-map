@@ -1,10 +1,12 @@
 package burgermap.entity;
 
 import burgermap.enums.MemberType;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,4 +28,6 @@ public class Member {
     private String password;
     private String email;
     private String nickname;
+    @OneToOne(optional = true, cascade = CascadeType.ALL)  // Image 엔티티의 persist 관리가 구현되지 않아 CascadeType.ALL 추가
+    private Image profileImage;
 }

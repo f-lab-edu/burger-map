@@ -1,11 +1,15 @@
 package burgermap.controller;
 
 import burgermap.annotation.CheckLogin;
+import burgermap.dto.image.ImageUploadRequestDto;
+import burgermap.dto.image.ImageUploadUrlDto;
 import burgermap.dto.member.MemberChangeableInfoDto;
 import burgermap.dto.member.MemberInfoDto;
 import burgermap.dto.member.MemberJoinRequestDto;
+import burgermap.dto.member.MemberJoinResponseDto;
 import burgermap.dto.member.MemberLoginDto;
 import burgermap.entity.Member;
+import burgermap.service.ImageService;
 import burgermap.service.MemberService;
 import burgermap.session.SessionConstants;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import java.util.Map;
+import java.util.Optional;
 
 
 @Slf4j
@@ -32,17 +37,28 @@ import java.util.Map;
 @RestController
 @RequestMapping("members")
 public class MemberController {
+    private static final String IMAGE_DIRECTORY_PATH = "profile-images";
 
     private final MemberService memberService;
+    private final ImageService imageService;
+
 
     /**
      * 회원 추가
      */
     @PostMapping
-    public MemberInfoDto addMember(@RequestBody MemberJoinRequestDto memberJoinRequestDto) {
+    public MemberJoinResponseDto addMember(@RequestBody MemberJoinRequestDto memberJoinRequestDto) {
         Member member = cvtToMember(memberJoinRequestDto);
-        memberService.addMember(member);
-        return cvtToMemberInfoDto(member);
+        memberService.addMember(member, memberJoinRequestDto.getProfileImageName());
+        return cvtToMemberJoinResponseDto(member);
+    }
+
+    @PostMapping("/image-upload-url")
+    public ImageUploadUrlDto getImageUploadUrl(@RequestBody ImageUploadRequestDto imageUploadRequestDto) {
+        Optional<ImageUploadUrlDto> presignedUploadUrl = imageService.createPresignedUploadUrl(
+                IMAGE_DIRECTORY_PATH,
+                imageUploadRequestDto.getImageName());
+        return presignedUploadUrl.orElseThrow();
     }
 
     /**
@@ -132,6 +148,13 @@ public class MemberController {
         return ResponseEntity.ok(cvtToMemberInfoDto(member));
     }
 
+    @CheckLogin
+    @PatchMapping("/my-info/profile-image")
+    public ResponseEntity<MemberInfoDto> changeProfileImage(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId, @RequestBody MemberChangeableInfoDto memberChangeableInfoDto) {
+        Member member = memberService.changeProfileImage(memberId, memberChangeableInfoDto.getProfileImageName());
+        return ResponseEntity.ok(cvtToMemberInfoDto(member));
+    }
+
     /**
      * 닉네임 변경
      * 로그인한 회원이 자신의 닉네임을 변경
@@ -177,6 +200,27 @@ public class MemberController {
         memberInfoDto.setLoginId(member.getLoginId());
         memberInfoDto.setEmail(member.getEmail());
         memberInfoDto.setNickname(member.getNickname());
+
+        if (member.getProfileImage() != null) {
+            String profileImageUrl = imageService.getImageUrl(
+                    IMAGE_DIRECTORY_PATH, member.getProfileImage().getImageName()).orElse(null);
+            memberInfoDto.setProfileImageUrl(profileImageUrl);
+        }
         return memberInfoDto;
+    }
+
+    private MemberJoinResponseDto cvtToMemberJoinResponseDto(Member member) {
+        MemberJoinResponseDto memberJoinResponseDto = new MemberJoinResponseDto();
+        memberJoinResponseDto.setMemberType(member.getMemberType());
+        memberJoinResponseDto.setLoginId(member.getLoginId());
+        memberJoinResponseDto.setEmail(member.getEmail());
+        memberJoinResponseDto.setNickname(member.getNickname());
+
+        if (member.getProfileImage() != null) {
+            String profileImageUrl = imageService.getImageUrl(
+                    IMAGE_DIRECTORY_PATH, member.getProfileImage().getImageName()).orElse(null);
+            memberJoinResponseDto.setProfileImageUrl(profileImageUrl);
+        }
+        return memberJoinResponseDto;
     }
 }

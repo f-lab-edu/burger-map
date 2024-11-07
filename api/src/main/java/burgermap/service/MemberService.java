@@ -1,5 +1,6 @@
 package burgermap.service;
 
+import burgermap.entity.Image;
 import burgermap.entity.Member;
 import burgermap.enums.MemberType;
 import burgermap.exception.member.MemberNotExistException;
@@ -20,7 +21,12 @@ public class MemberService {
 
     private final MemberRepository repository;
 
-    public void addMember(Member member) {
+    public void addMember(Member member, String profileImageName) {
+        if (profileImageName != null) {
+            Image profileImage = new Image();
+            profileImage.setImageName(profileImageName);
+            member.setProfileImage(profileImage);
+        }
         repository.save(member);
         log.debug("member added: {}", member);
     }
@@ -93,6 +99,21 @@ public class MemberService {
                 .orElseThrow(() -> new MemberNotExistException(memberId));
         member.setNickname(newNickname);
         log.debug("member nickname changed: {}", member);
+        return member;
+    }
+
+    public Member changeProfileImage(Long memberId, String profileImageName) {
+        Member member = repository.findByMemberId(memberId)
+                .orElseThrow(() -> new MemberNotExistException(memberId));
+        if (profileImageName == null) {  // 프로필 이미지 삭제
+            member.setProfileImage(null);
+        } else {
+            if (member.getProfileImage() != null)
+                member.getProfileImage().setInUse(false);  // 기존 이미지 미사용 처리
+            Image newProfileImage = new Image();  // 새 이미지 등록
+            newProfileImage.setImageName(profileImageName);
+            member.setProfileImage(newProfileImage);
+        }
         return member;
     }
 

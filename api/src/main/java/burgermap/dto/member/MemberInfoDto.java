@@ -13,4 +13,5 @@ public class MemberInfoDto {
     private String loginId;
     private String email;
     private String nickname;
+    private String profileImageUrl;
 }
