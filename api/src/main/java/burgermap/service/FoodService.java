@@ -32,7 +32,6 @@ import java.util.stream.Stream;
 @Slf4j
 @RequiredArgsConstructor
 public class FoodService {
-    private final MemberService memberService;
     private final StoreService storeService;
     private final MemberLookupService memberLookupService;
     private final StoreLookupService storeLookupService;

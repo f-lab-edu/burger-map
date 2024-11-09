@@ -2,7 +2,6 @@ package burgermap.service;
 
 import burgermap.entity.Store;
 import burgermap.exception.member.MemberNotExistException;
-import burgermap.exception.store.NotOwnerMemberException;
 import burgermap.exception.store.StoreNotExistException;
 import burgermap.repository.MemberRepository;
 import burgermap.repository.StoreRepository;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -23,19 +21,16 @@ public class StoreService {
     private final StoreLookupService storeLookupService;
 
     private final StoreRepository storeRepository;
-    private final MemberRepository memberRepository;
 
     public void addStore(Store store, Long memberId) {
         memberLookupService.isMemberTypeOwner(memberId);
-        store.setMember(memberRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new MemberNotExistException(memberId)));
+        store.setMember(memberLookupService.findByMemberId(memberId));
         storeRepository.save(store);
         log.debug("store added: {}", store);
     }
 
     public Store getStore(Long storeId) {
-        Store store = storeRepository.findByStoreId(storeId)
-                .orElseThrow(() -> new StoreNotExistException(storeId));
+        Store store = storeLookupService.findByStoreId(storeId);
         log.debug("store info: {}", store);
         return store;
     }

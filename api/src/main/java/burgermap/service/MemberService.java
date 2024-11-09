@@ -2,9 +2,7 @@ package burgermap.service;
 
 import burgermap.entity.Image;
 import burgermap.entity.Member;
-import burgermap.enums.MemberType;
 import burgermap.exception.member.MemberNotExistException;
-import burgermap.exception.store.NotOwnerMemberException;
 import burgermap.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +16,7 @@ import java.util.Optional;
 @Transactional
 @RequiredArgsConstructor
 public class MemberService {
+    private final MemberLookupService memberLookupService;
 
     private final MemberRepository repository;
 
@@ -72,39 +71,34 @@ public class MemberService {
     }
 
     public Member getMyInfo(Long memberId) {
-        Member member = repository.findByMemberId(memberId)
-                .orElseThrow(() -> new MemberNotExistException(memberId));
+        Member member = memberLookupService.findByMemberId(memberId);
         log.debug("member info: {}", member);
         return member;
     }
 
     public Member changePassword(Long memberId, String newPassword) {
-        Member member = repository.findByMemberId(memberId)
-                .orElseThrow(() -> new MemberNotExistException(memberId));
+        Member member = memberLookupService.findByMemberId(memberId);
         member.setPassword(newPassword);
         log.debug("member password changed: {}", member);
         return member;
     }
 
     public Member changeEmail(Long memberId, String newEmail) {
-        Member member = repository.findByMemberId(memberId)
-                .orElseThrow(() -> new MemberNotExistException(memberId));
+        Member member = memberLookupService.findByMemberId(memberId);
         member.setEmail(newEmail);
         log.debug("member email changed: {}", member);
         return member;
     }
 
     public Member changeNickname(Long memberId, String newNickname) {
-        Member member = repository.findByMemberId(memberId)
-                .orElseThrow(() -> new MemberNotExistException(memberId));
+        Member member = memberLookupService.findByMemberId(memberId);
         member.setNickname(newNickname);
         log.debug("member nickname changed: {}", member);
         return member;
     }
 
     public Member changeProfileImage(Long memberId, String profileImageName) {
-        Member member = repository.findByMemberId(memberId)
-                .orElseThrow(() -> new MemberNotExistException(memberId));
+        Member member = memberLookupService.findByMemberId(memberId);
         if (profileImageName == null) {  // 프로필 이미지 삭제
             member.setProfileImage(null);
         } else {
