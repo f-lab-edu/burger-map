@@ -45,7 +45,7 @@ public class StoreService {
 
     public Store updateStore(Long requestMemberId, Long storeId, Store newStoreInfo) {
         memberLookupService.isMemberTypeOwner(requestMemberId);
-        Store store = checkStoreExistence(storeId);
+        Store store = storeLookupService.findByStoreId(storeId);
         storeLookupService.checkStoreBelongTo(store, requestMemberId);
 
         store.setName(newStoreInfo.getName());
@@ -57,19 +57,11 @@ public class StoreService {
 
     public Store deleteStore(Long requestMemberId, Long storeId) {
         memberLookupService.isMemberTypeOwner(requestMemberId);
-        Store store = checkStoreExistence(storeId);
+        Store store = storeLookupService.findByStoreId(storeId);
         storeLookupService.checkStoreBelongTo(store, requestMemberId);
 
         storeRepository.deleteByStoreId(storeId);
         log.debug("store deleted: {}", store);
         return store;
-    }
-
-    /**
-     * storeId에 해당하는 가게가 존재하지 않으면 StoreNotExistException을 발생시킴
-     */
-    public Store checkStoreExistence(Long storeId) {
-        return storeRepository.findByStoreId(storeId)
-                .orElseThrow(() -> new StoreNotExistException(storeId));
     }
 }

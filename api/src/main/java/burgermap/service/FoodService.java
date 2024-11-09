@@ -54,7 +54,7 @@ public class FoodService {
 
     public Food addFood(Food food, Long storeId, Long memberId) {
         memberLookupService.isMemberTypeOwner(memberId);
-        Store store = storeService.checkStoreExistence(storeId);
+        Store store = storeLookupService.findByStoreId(storeId);
         storeLookupService.checkStoreBelongTo(store, memberId);
 
         food.setStore(store);
