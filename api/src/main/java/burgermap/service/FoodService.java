@@ -35,6 +35,7 @@ public class FoodService {
     private final MemberService memberService;
     private final StoreService storeService;
     private final MemberLookupService memberLookupService;
+    private final StoreLookupService storeLookupService;
 
     private final IngredientRepository ingredientRepository;
     private final MenuCategoryRepository menuCategoryRepository;
@@ -55,7 +56,7 @@ public class FoodService {
     public Food addFood(Food food, Long storeId, Long memberId) {
         memberLookupService.isMemberTypeOwner(memberId);
         Store store = storeService.checkStoreExistence(storeId);
-        storeService.checkStoreBelongTo(store, memberId);
+        storeLookupService.checkStoreBelongTo(store, memberId);
 
         food.setStore(store);
 

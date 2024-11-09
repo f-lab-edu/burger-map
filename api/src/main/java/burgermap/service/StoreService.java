@@ -20,6 +20,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class StoreService {
     private final MemberLookupService memberLookupService;
+    private final StoreLookupService storeLookupService;
 
     private final StoreRepository storeRepository;
     private final MemberRepository memberRepository;
@@ -50,7 +51,7 @@ public class StoreService {
     public Store updateStore(Long requestMemberId, Long storeId, Store newStoreInfo) {
         memberLookupService.isMemberTypeOwner(requestMemberId);
         Store store = checkStoreExistence(storeId);
-        checkStoreBelongTo(store, requestMemberId);
+        storeLookupService.checkStoreBelongTo(store, requestMemberId);
 
         store.setName(newStoreInfo.getName());
         store.setAddress(newStoreInfo.getAddress());
@@ -62,7 +63,7 @@ public class StoreService {
     public Store deleteStore(Long requestMemberId, Long storeId) {
         memberLookupService.isMemberTypeOwner(requestMemberId);
         Store store = checkStoreExistence(storeId);
-        checkStoreBelongTo(store, requestMemberId);
+        storeLookupService.checkStoreBelongTo(store, requestMemberId);
 
         storeRepository.deleteByStoreId(storeId);
         log.debug("store deleted: {}", store);
@@ -75,14 +76,5 @@ public class StoreService {
     public Store checkStoreExistence(Long storeId) {
         return storeRepository.findByStoreId(storeId)
                 .orElseThrow(() -> new StoreNotExistException(storeId));
-    }
-
-    /**
-     * store가 memberId의 소유가 아니면 NotOwnerMemberException을 발생시킴
-     */
-    public void checkStoreBelongTo(Store store, Long memberId) {
-        if (!store.getMember().getMemberId().equals(memberId)) {
-            throw new NotOwnerMemberException("member is not owner of the store.");
-        }
     }
 }
