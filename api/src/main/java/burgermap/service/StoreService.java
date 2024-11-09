@@ -19,13 +19,13 @@ import java.util.Optional;
 @Transactional
 @RequiredArgsConstructor
 public class StoreService {
-    private final MemberService memberService;
+    private final MemberLookupService memberLookupService;
 
     private final StoreRepository storeRepository;
     private final MemberRepository memberRepository;
 
     public void addStore(Store store, Long memberId) {
-        memberService.isMemberTypeOwner(memberId);
+        memberLookupService.isMemberTypeOwner(memberId);
         store.setMember(memberRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new MemberNotExistException(memberId)));
         storeRepository.save(store);
@@ -40,7 +40,7 @@ public class StoreService {
     }
 
     public List<Store> getMyStores(Long memberId) {
-        memberService.isMemberTypeOwner(memberId);
+        memberLookupService.isMemberTypeOwner(memberId);
 
         List<Store> stores = storeRepository.findByMemberId(memberId);
         log.debug("member {} - stores: {}", memberId, stores);
@@ -48,7 +48,7 @@ public class StoreService {
     }
 
     public Store updateStore(Long requestMemberId, Long storeId, Store newStoreInfo) {
-        memberService.isMemberTypeOwner(requestMemberId);
+        memberLookupService.isMemberTypeOwner(requestMemberId);
         Store store = checkStoreExistence(storeId);
         checkStoreBelongTo(store, requestMemberId);
 
@@ -60,7 +60,7 @@ public class StoreService {
     }
 
     public Store deleteStore(Long requestMemberId, Long storeId) {
-        memberService.isMemberTypeOwner(requestMemberId);
+        memberLookupService.isMemberTypeOwner(requestMemberId);
         Store store = checkStoreExistence(storeId);
         checkStoreBelongTo(store, requestMemberId);
 

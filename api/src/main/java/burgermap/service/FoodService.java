@@ -34,6 +34,7 @@ import java.util.stream.Stream;
 public class FoodService {
     private final MemberService memberService;
     private final StoreService storeService;
+    private final MemberLookupService memberLookupService;
 
     private final IngredientRepository ingredientRepository;
     private final MenuCategoryRepository menuCategoryRepository;
@@ -52,7 +53,7 @@ public class FoodService {
     }
 
     public Food addFood(Food food, Long storeId, Long memberId) {
-        memberService.isMemberTypeOwner(memberId);
+        memberLookupService.isMemberTypeOwner(memberId);
         Store store = storeService.checkStoreExistence(storeId);
         storeService.checkStoreBelongTo(store, memberId);
 

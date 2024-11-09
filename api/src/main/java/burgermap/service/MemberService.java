@@ -123,15 +123,4 @@ public class MemberService {
         log.debug("member deleted: {}", member);
         return member;
     }
-
-    /**
-     * memberId에 해당하는 회원이 OWNER가 아니면 NotOwnerMemberException을 발생시킴
-     */
-    public void isMemberTypeOwner(Long memberId) {
-        Member member = repository.findByMemberId(memberId)
-                .orElseThrow(() -> new MemberNotExistException(memberId));
-        if (member.getMemberType() != MemberType.OWNER) {
-            throw new NotOwnerMemberException("member type is not OWNER.");
-        }
-    }
 }
