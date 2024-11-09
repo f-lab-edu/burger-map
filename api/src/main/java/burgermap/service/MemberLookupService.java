@@ -22,9 +22,11 @@ public class MemberLookupService {
     /**
      * memberId에 해당하는 회원이 OWNER인지 확인. 아닌 경우 NotOwnerMemberException을 발생시킴
      */
-    public void isMemberTypeOwner(Long memberId) {
-        if (findByMemberId(memberId).getMemberType() != MemberType.OWNER) {
+    public Member isMemberTypeOwner(Long memberId) {
+        Member member = findByMemberId(memberId);
+        if (member.getMemberType() != MemberType.OWNER) {
             throw new NotOwnerMemberException("member type is not OWNER.");
         }
+        return member;
     }
 }

@@ -1,5 +1,6 @@
 package burgermap.service;
 
+import burgermap.entity.Member;
 import burgermap.entity.Store;
 import burgermap.exception.member.MemberNotExistException;
 import burgermap.exception.store.StoreNotExistException;
@@ -23,8 +24,8 @@ public class StoreService {
     private final StoreRepository storeRepository;
 
     public void addStore(Store store, Long memberId) {
-        memberLookupService.isMemberTypeOwner(memberId);
-        store.setMember(memberLookupService.findByMemberId(memberId));
+        Member member = memberLookupService.isMemberTypeOwner(memberId);
+        store.setMember(member);
         storeRepository.save(store);
         log.debug("store added: {}", store);
     }
