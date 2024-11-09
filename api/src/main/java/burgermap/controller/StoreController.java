@@ -4,27 +4,22 @@ import burgermap.annotation.CheckLogin;
 import burgermap.dto.store.StoreRequestDto;
 import burgermap.dto.store.StoreInfoDto;
 import burgermap.entity.Store;
-import burgermap.exception.store.NotOwnerMemberException;
 import burgermap.service.StoreService;
 import burgermap.session.SessionConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -39,7 +34,7 @@ public class StoreController {
      */
     @CheckLogin
     @PostMapping
-    public ResponseEntity<StoreInfoDto> addStore(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId,
+    public ResponseEntity<StoreInfoDto> addStore(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID, required = false) Long memberId,
                                                  @RequestBody StoreRequestDto storeRequestDto) {
         Store store = cvtToStore(storeRequestDto);
         storeService.addStore(store, memberId);
@@ -74,7 +69,7 @@ public class StoreController {
      */
     @CheckLogin
     @GetMapping("/my-stores")
-    public ResponseEntity<List<StoreInfoDto>> getMyStores(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId) {
+    public ResponseEntity<List<StoreInfoDto>> getMyStores(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID, required = false) Long memberId) {
         List<Store> stores = storeService.getMyStores(memberId);
         List<StoreInfoDto> storeDtolist = stores.stream().map(store -> cvtToStoreInfoDto(store)).toList();
         return ResponseEntity.ok(storeDtolist);
@@ -85,7 +80,7 @@ public class StoreController {
      */
     @CheckLogin
     @PutMapping("/{storeId}")
-    public ResponseEntity<StoreInfoDto> updateStore(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId,
+    public ResponseEntity<StoreInfoDto> updateStore(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID, required = false) Long memberId,
                                                     @PathVariable Long storeId,
                                                     @RequestBody StoreRequestDto storeRequestDto) {
         Store newStoreInfo = cvtToStore(storeRequestDto);
@@ -98,7 +93,7 @@ public class StoreController {
      */
     @CheckLogin
     @DeleteMapping("/{storeId}")
-    public ResponseEntity<StoreInfoDto> deleteStore(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId,
+    public ResponseEntity<StoreInfoDto> deleteStore(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID, required = false) Long memberId,
                                                     @PathVariable Long storeId) {
         Store store = storeService.deleteStore(memberId, storeId);
         return ResponseEntity.ok(cvtToStoreInfoDto(store));

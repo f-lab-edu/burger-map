@@ -53,7 +53,7 @@ public class FoodController {
     @CheckLogin
     @PostMapping("stores/{storeId}/foods")
     public ResponseEntity<FoodInfoDto> addFood(
-            @SessionAttribute(name = SessionConstants.loginMember) Long memberId,
+            @SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID) Long memberId,
             @PathVariable Long storeId,
             @RequestBody FoodInfoRequestDto foodInfoRequestDto) {
         Food food = cvtToFood(foodInfoRequestDto);

@@ -30,7 +30,7 @@ public class ReviewController {
     @PostMapping("foods/{foodId}/reviews")
     public ResponseEntity<ReviewResponseDto> addReview(
             @RequestBody ReviewAddRequestDto reviewAddRequestDto,
-            @SessionAttribute(name = SessionConstants.loginMember) Long memberId,
+            @SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID) Long memberId,
             @PathVariable Long foodId) {
         Review review = cvtToReview(reviewAddRequestDto);
         reviewService.addReview(review, memberId, foodId);
@@ -41,7 +41,7 @@ public class ReviewController {
     @CheckLogin
     @GetMapping("reviews/my-reviews")
     public ResponseEntity<List<ReviewResponseDto>> getMyReviews (
-            @SessionAttribute(name = SessionConstants.loginMember) Long memberId) {
+            @SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID) Long memberId) {
         return ResponseEntity.ok(cvtToReviewResponseDtoList(reviewService.getMemberReviews(memberId)));
     }
 

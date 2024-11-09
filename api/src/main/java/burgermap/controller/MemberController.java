@@ -98,7 +98,7 @@ public class MemberController {
         if (member == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("login", false));
         }
-        request.getSession().setAttribute(SessionConstants.loginMember, member.getMemberId());
+        request.getSession().setAttribute(SessionConstants.LOGIN_MEMBER_ID, member.getMemberId());
         return ResponseEntity.ok(Map.of("login", true));
     }
 
@@ -120,7 +120,7 @@ public class MemberController {
      */
     @CheckLogin
     @GetMapping("/my-info")
-    public ResponseEntity<MemberInfoDto> getMyInfo(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId) {
+    public ResponseEntity<MemberInfoDto> getMyInfo(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID, required = false) Long memberId) {
         Member member = memberService.getMyInfo(memberId);
         MemberInfoDto memberInfoDto = cvtToMemberInfoDto(member);
         return ResponseEntity.ok(memberInfoDto);
@@ -132,7 +132,7 @@ public class MemberController {
      */
     @CheckLogin
     @PatchMapping("/my-info/password")
-    public ResponseEntity<MemberInfoDto> changePassword(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId, @RequestBody MemberChangeableInfoDto memberChangeableInfoDto) {
+    public ResponseEntity<MemberInfoDto> changePassword(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID, required = false) Long memberId, @RequestBody MemberChangeableInfoDto memberChangeableInfoDto) {
         Member member = memberService.changePassword(memberId, memberChangeableInfoDto.getPassword());
         return ResponseEntity.ok(cvtToMemberInfoDto(member));
     }
@@ -143,14 +143,14 @@ public class MemberController {
      */
     @CheckLogin
     @PatchMapping("/my-info/email")
-    public ResponseEntity<MemberInfoDto> changeEmail(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId, @RequestBody MemberChangeableInfoDto memberChangeableInfoDto) {
+    public ResponseEntity<MemberInfoDto> changeEmail(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID, required = false) Long memberId, @RequestBody MemberChangeableInfoDto memberChangeableInfoDto) {
         Member member = memberService.changeEmail(memberId, memberChangeableInfoDto.getEmail());
         return ResponseEntity.ok(cvtToMemberInfoDto(member));
     }
 
     @CheckLogin
     @PatchMapping("/my-info/profile-image")
-    public ResponseEntity<MemberInfoDto> changeProfileImage(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId, @RequestBody MemberChangeableInfoDto memberChangeableInfoDto) {
+    public ResponseEntity<MemberInfoDto> changeProfileImage(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID, required = false) Long memberId, @RequestBody MemberChangeableInfoDto memberChangeableInfoDto) {
         Member member = memberService.changeProfileImage(memberId, memberChangeableInfoDto.getProfileImageName());
         return ResponseEntity.ok(cvtToMemberInfoDto(member));
     }
@@ -161,7 +161,7 @@ public class MemberController {
      */
     @CheckLogin
     @PatchMapping("/my-info/nickname")
-    public ResponseEntity<MemberInfoDto> changeNickname(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId, @RequestBody MemberChangeableInfoDto memberChangeableInfoDto) {
+    public ResponseEntity<MemberInfoDto> changeNickname(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID, required = false) Long memberId, @RequestBody MemberChangeableInfoDto memberChangeableInfoDto) {
         Member member = memberService.changeNickname(memberId, memberChangeableInfoDto.getNickname());
         return ResponseEntity.ok(cvtToMemberInfoDto(member));
     }
@@ -173,7 +173,7 @@ public class MemberController {
      */
     @CheckLogin
     @DeleteMapping("/my-info")
-    public ResponseEntity<MemberInfoDto> deleteMember(@SessionAttribute(name = SessionConstants.loginMember, required = false) Long memberId, HttpServletRequest request) {
+    public ResponseEntity<MemberInfoDto> deleteMember(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID, required = false) Long memberId, HttpServletRequest request) {
         Member deletedMember = memberService.deleteMember(memberId);
         request.getSession(false).invalidate();  // 삭제와 동시에 로그아웃
 
