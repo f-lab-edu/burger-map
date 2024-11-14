@@ -60,13 +60,13 @@ public class MemberService {
         return member.or(() -> { // 아이디에 해당하는 회원이 존재하지 않는 경우
             log.debug("login failed: member with login id {} not exist", loginId);
             return Optional.empty();
-        }).map(m -> {  // 비밀번호 비교
+        }).filter(m -> {  // 비밀번호 비교
             if (!m.getPassword().equals(password)) {
                 log.debug("login failed: incorrect password (login id: {})", loginId);
-                return null;
+                return false;
             }
             log.debug("login success: {}", m);
-            return m;
+            return true;
         }).orElse(null);
     }
 
