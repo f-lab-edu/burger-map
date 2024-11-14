@@ -1,7 +1,6 @@
 package burgermap.repository;
 
 import burgermap.entity.Member;
-import org.springframework.stereotype.Repository;
 
 import java.util.Map;
 import java.util.Optional;

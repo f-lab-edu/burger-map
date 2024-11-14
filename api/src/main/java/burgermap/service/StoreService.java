@@ -2,9 +2,6 @@ package burgermap.service;
 
 import burgermap.entity.Member;
 import burgermap.entity.Store;
-import burgermap.exception.member.MemberNotExistException;
-import burgermap.exception.store.StoreNotExistException;
-import burgermap.repository.MemberRepository;
 import burgermap.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

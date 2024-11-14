@@ -1,8 +1,8 @@
 package burgermap.controller;
 
 import burgermap.annotation.CheckLogin;
-import burgermap.dto.store.StoreRequestDto;
 import burgermap.dto.store.StoreInfoDto;
+import burgermap.dto.store.StoreRequestDto;
 import burgermap.entity.Store;
 import burgermap.service.StoreService;
 import burgermap.session.SessionConstants;

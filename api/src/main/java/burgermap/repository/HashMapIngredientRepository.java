@@ -3,7 +3,6 @@ package burgermap.repository;
 import burgermap.entity.Ingredient;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;

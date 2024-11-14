@@ -2,19 +2,13 @@ package burgermap.service;
 
 import burgermap.entity.Food;
 import burgermap.entity.Ingredient;
-import burgermap.entity.Member;
 import burgermap.entity.MenuCategory;
 import burgermap.entity.Store;
-import burgermap.enums.MemberType;
 import burgermap.enums.MenuType;
 import burgermap.exception.food.FoodAttributeNotExistException;
-import burgermap.exception.store.NotOwnerMemberException;
-import burgermap.exception.store.StoreNotExistException;
 import burgermap.repository.FoodRepository;
 import burgermap.repository.IngredientRepository;
-import burgermap.repository.MemberRepository;
 import burgermap.repository.MenuCategoryRepository;
-import burgermap.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Transactional
