@@ -55,19 +55,19 @@ public class MemberService {
     }
 
     public Member login(String loginId, String password) {
-        Optional<Member> member = repository.findByLoginId(loginId);
         // 로그인 실패: loginId를 가진 회원이 존재하지 않는 경우, 회원은 존재하되 pw가 다른 경우
-        if (member.isPresent()) {
-            log.debug("login member : {}", member.get());
-            if (member.get().getPassword().equals(password)) {
-                return member.get();
-            } else {
-                log.debug("login fail: incorrect password");
+        Optional<Member> member = repository.findByLoginId(loginId);
+        return member.or(() -> { // 아이디에 해당하는 회원이 존재하지 않는 경우
+            log.debug("login failed: member with login id {} not exist", loginId);
+            return Optional.empty();
+        }).map(m -> {  // 비밀번호 비교
+            if (!m.getPassword().equals(password)) {
+                log.debug("login failed: incorrect password (login id: {})", loginId);
                 return null;
             }
-        }
-        log.debug("login fail: member not found (loginId: {})", loginId);
-        return null;
+            log.debug("login success: {}", m);
+            return m;
+        }).orElse(null);
     }
 
     public Member getMyInfo(Long memberId) {
