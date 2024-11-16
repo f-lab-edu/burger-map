@@ -9,6 +9,7 @@ import burgermap.session.SessionConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,6 +56,14 @@ public class ReviewController {
     @GetMapping("stores/{storeId}/reviews")
     public ResponseEntity<List<ReviewResponseDto>> getStoreReviews (@PathVariable Long storeId) {
         return ResponseEntity.ok(cvtToReviewResponseDtoList(reviewService.getStoreReviews(storeId)));
+    }
+
+    @DeleteMapping("reviews/{reviewId}")
+    public ResponseEntity<ReviewResponseDto> deleteReview(
+            @SessionAttribute(name = SessionConstants.loginMember) Long memberId,
+            @PathVariable Long reviewId) {
+        Review review = reviewService.deleteReview(reviewId, memberId);
+        return ResponseEntity.ok(cvtToReviewResponseDto(review));
     }
 
     // DTO -> Entity

@@ -2,6 +2,7 @@ package burgermap.service;
 
 import burgermap.entity.Food;
 import burgermap.entity.Review;
+import burgermap.exception.review.NotReviewAuthorException;
 import burgermap.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,11 @@ public class ReviewService {
         Long requestMemberId = memberLookupService.findByMemberId(memberId).getMemberId();
         Review review = reviewLookupService.findByReviewId(reviewId);
 
-        // TODO: 리뷰 작성 회원과 삭제 요청 회원이 같은지 확인, 아닌 경우 예외
+        // 리뷰 작성 회원과 삭제 요청 회원이 같은지 확인, 아닌 경우 예외 발생
+        if (!review.getMember().getMemberId().equals(requestMemberId)) {
+            throw new NotReviewAuthorException(reviewId, requestMemberId);
+        }
+
         repository.deleteByReviewId(reviewId);
         log.debug("review deleted: {}", review);
         return review;
