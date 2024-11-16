@@ -9,19 +9,24 @@ import burgermap.entity.Food;
 import burgermap.entity.Ingredient;
 import burgermap.entity.MenuCategory;
 import burgermap.enums.MenuType;
+import burgermap.exception.food.FoodAttributeNotExistException;
 import burgermap.service.FoodService;
 import burgermap.session.SessionConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,6 +34,12 @@ import java.util.List;
 public class FoodController {
 
     private final FoodService foodService;
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(FoodAttributeNotExistException.class)
+    public Map<String, String> handleFoodAttributeNotExistException(FoodAttributeNotExistException e) {
+        return Map.of("message", e.getMessage());
+    }
 
     @GetMapping("foods/menu-types")
     public ResponseEntity<List<String>> getMenuTypes() {
