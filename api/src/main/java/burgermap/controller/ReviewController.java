@@ -38,6 +38,13 @@ public class ReviewController {
         return ResponseEntity.ok(cvtToReviewResponseDto(review));
     }
 
+    // 개별 리뷰 조회
+    @GetMapping("reviews/{reviewId}")
+    public ResponseEntity<ReviewResponseDto> getReview (@PathVariable Long reviewId) {
+        Review review = reviewService.getReview(reviewId);
+        return ResponseEntity.ok(cvtToReviewResponseDto(review));
+    }
+
     // 로그인한 회원이 작성한 모든 리뷰 조회
     @CheckLogin
     @GetMapping("reviews/my-reviews")
