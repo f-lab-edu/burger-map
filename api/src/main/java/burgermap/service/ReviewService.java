@@ -1,7 +1,10 @@
 package burgermap.service;
 
 import burgermap.entity.Food;
+import burgermap.entity.Member;
 import burgermap.entity.Review;
+import burgermap.exception.food.FoodNotExistException;
+import burgermap.exception.member.MemberNotExistException;
 import burgermap.exception.review.NotReviewAuthorException;
 import burgermap.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
@@ -24,10 +29,17 @@ public class ReviewService {
 
     public void addReview(Review review, Long memberId, Long foodId) {
         // TODO: 회원이 CUSTOMER 타입인지 확인, 아닌 경우 예외
-        Food food = foodLookupService.findByFoodId(foodId);
+        CompletableFuture<Optional<Food>> foodAsync = foodLookupService.findByFoodIdAsync(foodId);
+        CompletableFuture<Optional<Member>> memberAsync = memberLookupService.findByMemberIdAsync(memberId);
+
+        CompletableFuture.allOf(foodAsync, memberAsync).join();
+
+        Food food = foodAsync.join().orElseThrow(() -> new FoodNotExistException(foodId));
+        Member member = memberAsync.join().orElseThrow(() -> new MemberNotExistException(memberId));
+
         review.setFood(food);
         review.setStore(food.getStore());
-        review.setMember(memberLookupService.findByMemberId(memberId));
+        review.setMember(member);
         repository.save(review);
         log.debug("review added: {}", review);
     }
