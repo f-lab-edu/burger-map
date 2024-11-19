@@ -1,6 +1,7 @@
 package burgermap.controller;
 
 import burgermap.annotation.CheckLogin;
+import burgermap.dto.food.FoodAttributeDto;
 import burgermap.dto.food.FoodInfoDto;
 import burgermap.dto.food.FoodInfoRequestDto;
 import burgermap.dto.food.IngredientInfoDto;
@@ -59,6 +60,19 @@ public class FoodController {
         List<Ingredient> ingredients = foodService.getIngredients();
         List<IngredientInfoDto> ingredientInfoDtoList = ingredients.stream().map(this::cvtToIngredientInfoDto).toList();
         return ResponseEntity.ok(ingredientInfoDtoList);
+    }
+
+    /**
+     * 음식 속성 정보(메뉴 타입, 메뉴 카테고리, 재료) 조회
+     * @return 음식 속성 정보 DTO
+     */
+    @GetMapping("foods/food-attributes")
+    public ResponseEntity<FoodAttributeDto> getFoodAttributes() {
+        FoodAttributeDto foodAttributeDto = new FoodAttributeDto();
+        foodAttributeDto.setMenuTypes(foodService.getMenuTypes());
+        foodAttributeDto.setMenuCategories(foodService.getMenuCategories().stream().map(this::cvtToMenuCategoryInfoDto).toList());
+        foodAttributeDto.setIngredients(foodService.getIngredients().stream().map(this::cvtToIngredientInfoDto).toList());
+        return ResponseEntity.ok(foodAttributeDto);
     }
 
     @CheckLogin
