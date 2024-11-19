@@ -6,6 +6,7 @@ import burgermap.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,9 +19,9 @@ public class ReviewService {
 
     private final ReviewLookupService reviewLookupService;
     private final MemberLookupService memberLookupService;
-    private final StoreLookupService storeLookupService;
     private final FoodLookupService foodLookupService;
 
+    @Transactional
     public void addReview(Review review, Long memberId, Long foodId) {
         // TODO: 회원이 CUSTOMER 타입인지 확인, 아닌 경우 예외
         Food food = foodLookupService.findByFoodId(foodId);
@@ -35,6 +36,7 @@ public class ReviewService {
         return reviewLookupService.findByReviewId(reviewId);
     }
 
+    @Transactional
     public Review deleteReview(Long reviewId, Long memberId) {
         Long requestMemberId = memberLookupService.findByMemberId(memberId).getMemberId();
         Review review = reviewLookupService.findByReviewId(reviewId);

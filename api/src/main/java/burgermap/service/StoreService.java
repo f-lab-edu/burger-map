@@ -12,7 +12,6 @@ import java.util.List;
 
 @Slf4j
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class StoreService {
     private final MemberLookupService memberLookupService;
@@ -20,6 +19,7 @@ public class StoreService {
 
     private final StoreRepository storeRepository;
 
+    @Transactional
     public void addStore(Store store, Long memberId) {
         Member member = memberLookupService.isMemberTypeOwner(memberId);
         store.setMember(member);
@@ -41,6 +41,7 @@ public class StoreService {
         return stores;
     }
 
+    @Transactional
     public Store updateStore(Long requestMemberId, Long storeId, Store newStoreInfo) {
         memberLookupService.isMemberTypeOwner(requestMemberId);
         Store store = storeLookupService.findByStoreId(storeId);
@@ -53,6 +54,7 @@ public class StoreService {
         return store;
     }
 
+    @Transactional
     public Store deleteStore(Long requestMemberId, Long storeId) {
         memberLookupService.isMemberTypeOwner(requestMemberId);
         Store store = storeLookupService.findByStoreId(storeId);

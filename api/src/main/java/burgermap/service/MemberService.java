@@ -13,13 +13,13 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberLookupService memberLookupService;
 
     private final MemberRepository repository;
 
+    @Transactional
     public void addMember(Member member, String profileImageName) {
         if (profileImageName != null) {
             Image profileImage = new Image();
@@ -76,6 +76,7 @@ public class MemberService {
         return member;
     }
 
+    @Transactional
     public Member changePassword(Long memberId, String newPassword) {
         Member member = memberLookupService.findByMemberId(memberId);
         member.setPassword(newPassword);
@@ -83,6 +84,7 @@ public class MemberService {
         return member;
     }
 
+    @Transactional
     public Member changeEmail(Long memberId, String newEmail) {
         Member member = memberLookupService.findByMemberId(memberId);
         member.setEmail(newEmail);
@@ -90,6 +92,7 @@ public class MemberService {
         return member;
     }
 
+    @Transactional
     public Member changeNickname(Long memberId, String newNickname) {
         Member member = memberLookupService.findByMemberId(memberId);
         member.setNickname(newNickname);
@@ -97,6 +100,7 @@ public class MemberService {
         return member;
     }
 
+    @Transactional
     public Member changeProfileImage(Long memberId, String profileImageName) {
         Member member = memberLookupService.findByMemberId(memberId);
         if (profileImageName == null) {  // 프로필 이미지 삭제
@@ -111,6 +115,7 @@ public class MemberService {
         return member;
     }
 
+    @Transactional
     public Member deleteMember(Long memberId) {
         Member member = repository.deleteByMemberId(memberId)
                 .orElseThrow(() -> new MemberNotExistException(memberId));;

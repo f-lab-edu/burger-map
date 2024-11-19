@@ -21,7 +21,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 @Slf4j
 @RequiredArgsConstructor
 public class FoodService {
@@ -45,6 +44,7 @@ public class FoodService {
         return ingredientRepository.findAll();
     }
 
+    @Transactional
     public Food addFood(Food food, Long storeId, Long memberId) {
         memberLookupService.isMemberTypeOwner(memberId);
         Store store = storeLookupService.findByStoreId(storeId);
