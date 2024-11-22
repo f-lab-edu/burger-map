@@ -180,16 +180,13 @@ public class MemberController {
         return ResponseEntity.ok(cvtToMemberInfoDto(deletedMember));
     }
 
-    private Member cvtToMember(Object memberDto) {
+    private Member cvtToMember(MemberJoinRequestDto memberJoinRequestDto) {
         Member member = new Member();
-
-        if (memberDto instanceof MemberJoinRequestDto memberJoinRequestDto) {
-            member.setMemberType(memberJoinRequestDto.getMemberType());
-            member.setLoginId(memberJoinRequestDto.getLoginId());
-            member.setPassword(memberJoinRequestDto.getPassword());
-            member.setEmail(memberJoinRequestDto.getEmail());
-            member.setNickname(memberJoinRequestDto.getNickname());
-        }
+        member.setMemberType(memberJoinRequestDto.getMemberType());
+        member.setLoginId(memberJoinRequestDto.getLoginId());
+        member.setPassword(memberJoinRequestDto.getPassword());
+        member.setEmail(memberJoinRequestDto.getEmail());
+        member.setNickname(memberJoinRequestDto.getNickname());
 
         return member;
     }
