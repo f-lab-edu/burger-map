@@ -1,6 +1,7 @@
 package burgermap.controller;
 
 import burgermap.annotation.CheckLogin;
+import burgermap.dto.common.ExceptionMessageDto;
 import burgermap.dto.food.FoodAttributeDto;
 import burgermap.dto.food.FoodInfoDto;
 import burgermap.dto.food.FoodInfoRequestDto;
@@ -27,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,8 +38,8 @@ public class FoodController {
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(FoodAttributeNotExistException.class)
-    public Map<String, String> handleFoodAttributeNotExistException(FoodAttributeNotExistException e) {
-        return Map.of("message", e.getMessage());
+    public ExceptionMessageDto handleFoodAttributeNotExistException(FoodAttributeNotExistException e) {
+        return new ExceptionMessageDto(e.getMessage());
     }
 
     @GetMapping("foods/menu-types")
