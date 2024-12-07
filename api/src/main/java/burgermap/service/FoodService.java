@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FoodService {
     private final StoreService storeService;
+    private final FoodLookupService foodLookupService;
     private final MemberLookupService memberLookupService;
     private final StoreLookupService storeLookupService;
 
@@ -53,6 +54,12 @@ public class FoodService {
         food.setStore(store);
 
         return foodRepository.save(food);
+    }
+
+    public Food getFood(Long foodId) {
+        Food food = foodLookupService.findByFoodId(foodId);
+        log.debug("food info: {}", food);
+        return food;
     }
 
     public List<Ingredient> ingredientIdsToIngredients(List<Long> ingredientIds) {

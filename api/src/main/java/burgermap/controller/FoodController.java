@@ -86,6 +86,12 @@ public class FoodController {
         return ResponseEntity.ok(cvtToFoodInfoDto(addedFood));
     }
 
+    @GetMapping("foods/{foodId}")
+    public ResponseEntity<FoodInfoDto> getFood(@PathVariable Long foodId) {
+        Food food = foodService.getFood(foodId);
+        return ResponseEntity.ok(cvtToFoodInfoDto(food));
+    }
+
     public MenuCategoryInfoDto cvtToMenuCategoryInfoDto(MenuCategory menuCategory) {
         MenuCategoryInfoDto menuCategoryInfoDto = new MenuCategoryInfoDto();
         menuCategoryInfoDto.setMenuCategoryId(menuCategory.getMenuCategoryId());
