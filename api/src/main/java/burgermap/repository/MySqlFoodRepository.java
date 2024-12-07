@@ -29,7 +29,7 @@ public class MySqlFoodRepository implements FoodRepository{
 
     @Override
     public List<Food> findByStoreId(Long storeId) {
-        String jpql = "select f from Food f where f.storeId = :storeId";
+        String jpql = "select f from Food f where f.store.storeId = :storeId";
         TypedQuery<Food> query = em.createQuery(jpql, Food.class);
         query.setParameter("storeId", storeId);
         return query.getResultList();
