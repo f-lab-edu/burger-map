@@ -6,6 +6,7 @@ import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,5 +34,12 @@ public class MySqlFoodRepository implements FoodRepository{
         TypedQuery<Food> query = em.createQuery(jpql, Food.class);
         query.setParameter("storeId", storeId);
         return query.getResultList();
+    }
+
+    @Override
+    public Optional<Food> deleteByFoodId(Long foodId) {
+        Food food = em.find(Food.class, foodId);
+        em.remove(food);
+        return Optional.ofNullable(food);
     }
 }

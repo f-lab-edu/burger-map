@@ -91,6 +91,16 @@ public class FoodService {
         return food;
     }
 
+    @Transactional
+    public Food deleteFood(Long requestMemberId, Long foodId) {
+        Food food = foodLookupService.findByFoodId(foodId);
+        storeLookupService.checkStoreBelongTo(food.getStore(), requestMemberId);
+        foodRepository.deleteByFoodId(foodId);
+        log.debug("food deleted: {}", food);
+        return food;
+    }
+
+
     public List<Ingredient> ingredientIdsToIngredients(List<Long> ingredientIds) {
         // ingredientId, Optional<Ingredient> 맵으로 변환
         Map<Long, Optional<Ingredient>> ingredientMap = ingredientIds.stream()

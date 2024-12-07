@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -114,6 +115,14 @@ public class FoodController {
         Food newFoodInfo = cvtToFood(foodInfoRequestDto);
         Food newFood = foodService.updateFood(memberId, foodId, newFoodInfo);
         return ResponseEntity.ok(cvtToFoodInfoDto(newFood));
+    }
+
+    @DeleteMapping("foods/{foodId}")
+    public ResponseEntity<FoodInfoDto> deleteFood(
+            @SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID) Long memberId,
+            @PathVariable Long foodId) {
+        Food food = foodService.deleteFood(memberId, foodId);
+        return ResponseEntity.ok(cvtToFoodInfoDto(food));
     }
 
     public MenuCategoryInfoDto cvtToMenuCategoryInfoDto(MenuCategory menuCategory) {

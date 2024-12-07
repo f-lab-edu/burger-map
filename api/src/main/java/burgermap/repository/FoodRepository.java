@@ -11,4 +11,6 @@ public interface FoodRepository {
     public Optional<Food> findByFoodId(Long foodId);
 
     public List<Food> findByStoreId(Long storeId);
+
+    public Optional<Food> deleteByFoodId(Long foodId);
 }
