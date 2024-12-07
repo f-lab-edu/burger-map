@@ -94,6 +94,16 @@ public class FoodController {
     }
 
     /**
+     * 특정 가게에 등록된 모든 음식 조회
+     */
+    @GetMapping("stores/{storeId}/foods")
+    public ResponseEntity<List<FoodInfoDto>> getStoreFoods(@PathVariable Long storeId) {
+        List<Food> foods = foodService.getStoreFoods(storeId);
+        List<FoodInfoDto> foodInfoDtoList = foods.stream().map(this::cvtToFoodInfoDto).toList();
+        return ResponseEntity.ok(foodInfoDtoList);
+    }
+
+    /**
      * 음식 정보 수정
      */
     @PutMapping("foods/{foodId}")

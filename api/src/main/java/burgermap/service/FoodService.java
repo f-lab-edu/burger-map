@@ -63,6 +63,16 @@ public class FoodService {
     }
 
     /**
+     * 특정 가게 엔티티와 관계된 모든 음식 엔티티 조회
+     */
+    public List<Food> getStoreFoods(Long storeId) {
+        storeLookupService.validateStoreExists(storeId);
+        List<Food> foods = foodLookupService.findByStoreId(storeId);
+        log.debug("store {} - foods: {}", storeId, foods);
+        return foods;
+    }
+
+    /**
      * 음식 엔티티 수정
      * 요청 회원이 음식이 등록된 가게의 소유자 여부 확인, 음식 엔티티 수정
      */
