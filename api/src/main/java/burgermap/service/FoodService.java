@@ -62,6 +62,25 @@ public class FoodService {
         return food;
     }
 
+    /**
+     * 음식 엔티티 수정
+     * 요청 회원이 음식이 등록된 가게의 소유자 여부 확인, 음식 엔티티 수정
+     */
+    @Transactional
+    public Food updateFood(Long requestMemberId, Long foodId, Food newFoodInfo) {
+        Food food = foodLookupService.findByFoodId(foodId);
+        storeLookupService.checkStoreBelongTo(food.getStore(), requestMemberId);
+
+        food.setName(newFoodInfo.getName());
+        food.setPrice(newFoodInfo.getPrice());
+        food.setDescription(newFoodInfo.getDescription());
+        food.setMenuType(newFoodInfo.getMenuType());
+        food.setMenuCategory(newFoodInfo.getMenuCategory());
+        food.setIngredients(newFoodInfo.getIngredients());
+
+        return food;
+    }
+
     public List<Ingredient> ingredientIdsToIngredients(List<Long> ingredientIds) {
         // ingredientId, Optional<Ingredient> 맵으로 변환
         Map<Long, Optional<Ingredient>> ingredientMap = ingredientIds.stream()

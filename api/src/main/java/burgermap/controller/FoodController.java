@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -90,6 +91,19 @@ public class FoodController {
     public ResponseEntity<FoodInfoDto> getFood(@PathVariable Long foodId) {
         Food food = foodService.getFood(foodId);
         return ResponseEntity.ok(cvtToFoodInfoDto(food));
+    }
+
+    /**
+     * 음식 정보 수정
+     */
+    @PutMapping("foods/{foodId}")
+    public ResponseEntity<FoodInfoDto> updateFood(
+            @SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID) Long memberId,
+            @PathVariable Long foodId,
+            @RequestBody FoodInfoRequestDto foodInfoRequestDto) {
+        Food newFoodInfo = cvtToFood(foodInfoRequestDto);
+        Food newFood = foodService.updateFood(memberId, foodId, newFoodInfo);
+        return ResponseEntity.ok(cvtToFoodInfoDto(newFood));
     }
 
     public MenuCategoryInfoDto cvtToMenuCategoryInfoDto(MenuCategory menuCategory) {
