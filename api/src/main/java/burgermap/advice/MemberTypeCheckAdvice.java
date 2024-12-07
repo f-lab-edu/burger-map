@@ -1,5 +1,6 @@
 package burgermap.advice;
 
+import burgermap.dto.common.ExceptionMessageDto;
 import burgermap.exception.store.NotOwnerMemberException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,7 +18,7 @@ public class MemberTypeCheckAdvice {
      */
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(NotOwnerMemberException.class)
-    public Map<String, String> handleNotOwnerMemberException(NotOwnerMemberException e) {
-        return Map.of("message", e.getMessage());
+    public ExceptionMessageDto handleNotOwnerMemberException(NotOwnerMemberException e) {
+        return new ExceptionMessageDto(e.getMessage());
     }
 }

@@ -1,5 +1,6 @@
 package burgermap.advice;
 
+import burgermap.dto.common.ExceptionMessageDto;
 import burgermap.exception.member.MemberNotExistException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ public class MemberExceptionAdvice {
      */
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(MemberNotExistException.class)
-    public Map<String, String> handleMemberNotExistException(MemberNotExistException e) {
-        return Map.of("message", e.getMessage());
+    public ExceptionMessageDto handleMemberNotExistException(MemberNotExistException e) {
+        return new ExceptionMessageDto(e.getMessage());
     }
 }
