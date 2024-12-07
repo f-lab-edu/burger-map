@@ -1,5 +1,6 @@
 package burgermap.advice;
 
+import burgermap.dto.common.ExceptionMessageDto;
 import burgermap.exception.store.StoreNotExistException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,7 +18,7 @@ public class StoreExceptionAdvice {
      */
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(StoreNotExistException.class)
-    public Map<String, String> handleStoreNotExistException(StoreNotExistException e) {
-        return Map.of("message", e.getMessage());
+    public ExceptionMessageDto handleStoreNotExistException(StoreNotExistException e) {
+        return new ExceptionMessageDto(e.getMessage());
     }
 }

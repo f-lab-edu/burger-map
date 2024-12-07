@@ -21,7 +21,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
         if (handler instanceof HandlerMethod handlerMethod) {
             if (handlerMethod.hasMethodAnnotation(CheckLogin.class)) {
                 HttpSession session = request.getSession(false);
-                if (session == null || session.getAttribute(SessionConstants.loginMember) == null) {
+                if (session == null || session.getAttribute(SessionConstants.LOGIN_MEMBER_ID) == null) {
                     log.debug("[{}] request from client that not logged in", request.getRequestURI());
                     response.setStatus(HttpStatus.UNAUTHORIZED.value());
                     return false;

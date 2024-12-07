@@ -1,36 +1,29 @@
 package burgermap.entity;
 
-import burgermap.enums.MenuType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
-
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 @Entity
-public class Food {
+public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long foodId;
+    private Long reviewId;
+    @ManyToOne
+    private Member member;
     @ManyToOne
     private Store store;
-    private String name;
-    private Integer price;
-    private String description;
-    private MenuType menuType;
     @ManyToOne
-    private MenuCategory menuCategory;
-    @ManyToMany
-    private List<Ingredient> ingredients;
+    private Food food;
+    private String content;
 }

@@ -2,9 +2,7 @@ package burgermap.service;
 
 import burgermap.entity.Image;
 import burgermap.entity.Member;
-import burgermap.enums.MemberType;
 import burgermap.exception.member.MemberNotExistException;
-import burgermap.exception.store.NotOwnerMemberException;
 import burgermap.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,12 +13,13 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class MemberService {
+    private final MemberLookupService memberLookupService;
 
     private final MemberRepository repository;
 
+    @Transactional
     public void addMember(Member member, String profileImageName) {
         if (profileImageName != null) {
             Image profileImage = new Image();
@@ -56,55 +55,54 @@ public class MemberService {
     }
 
     public Member login(String loginId, String password) {
-        Optional<Member> member = repository.findByLoginId(loginId);
         // 로그인 실패: loginId를 가진 회원이 존재하지 않는 경우, 회원은 존재하되 pw가 다른 경우
-        if (member.isPresent()) {
-            log.debug("login member : {}", member.get());
-            if (member.get().getPassword().equals(password)) {
-                return member.get();
-            } else {
-                log.debug("login fail: incorrect password");
-                return null;
+        Optional<Member> member = repository.findByLoginId(loginId);
+        return member.or(() -> { // 아이디에 해당하는 회원이 존재하지 않는 경우
+            log.debug("login failed: member with login id {} not exist", loginId);
+            return Optional.empty();
+        }).filter(m -> {  // 비밀번호 비교
+            if (!m.getPassword().equals(password)) {
+                log.debug("login failed: incorrect password (login id: {})", loginId);
+                return false;
             }
-        }
-        log.debug("login fail: member not found (loginId: {})", loginId);
-        return null;
+            log.debug("login success: {}", m);
+            return true;
+        }).orElse(null);
     }
 
     public Member getMyInfo(Long memberId) {
-        Member member = repository.findByMemberId(memberId)
-                .orElseThrow(() -> new MemberNotExistException(memberId));
+        Member member = memberLookupService.findByMemberId(memberId);
         log.debug("member info: {}", member);
         return member;
     }
 
+    @Transactional
     public Member changePassword(Long memberId, String newPassword) {
-        Member member = repository.findByMemberId(memberId)
-                .orElseThrow(() -> new MemberNotExistException(memberId));
+        Member member = memberLookupService.findByMemberId(memberId);
         member.setPassword(newPassword);
         log.debug("member password changed: {}", member);
         return member;
     }
 
+    @Transactional
     public Member changeEmail(Long memberId, String newEmail) {
-        Member member = repository.findByMemberId(memberId)
-                .orElseThrow(() -> new MemberNotExistException(memberId));
+        Member member = memberLookupService.findByMemberId(memberId);
         member.setEmail(newEmail);
         log.debug("member email changed: {}", member);
         return member;
     }
 
+    @Transactional
     public Member changeNickname(Long memberId, String newNickname) {
-        Member member = repository.findByMemberId(memberId)
-                .orElseThrow(() -> new MemberNotExistException(memberId));
+        Member member = memberLookupService.findByMemberId(memberId);
         member.setNickname(newNickname);
         log.debug("member nickname changed: {}", member);
         return member;
     }
 
+    @Transactional
     public Member changeProfileImage(Long memberId, String profileImageName) {
-        Member member = repository.findByMemberId(memberId)
-                .orElseThrow(() -> new MemberNotExistException(memberId));
+        Member member = memberLookupService.findByMemberId(memberId);
         if (profileImageName == null) {  // 프로필 이미지 삭제
             member.setProfileImage(null);
         } else {
@@ -117,21 +115,11 @@ public class MemberService {
         return member;
     }
 
+    @Transactional
     public Member deleteMember(Long memberId) {
         Member member = repository.deleteByMemberId(memberId)
                 .orElseThrow(() -> new MemberNotExistException(memberId));;
         log.debug("member deleted: {}", member);
         return member;
-    }
-
-    /**
-     * memberId에 해당하는 회원이 OWNER가 아니면 NotOwnerMemberException을 발생시킴
-     */
-    public void isMemberTypeOwner(Long memberId) {
-        Member member = repository.findByMemberId(memberId)
-                .orElseThrow(() -> new MemberNotExistException(memberId));
-        if (member.getMemberType() != MemberType.OWNER) {
-            throw new NotOwnerMemberException("member type is not OWNER.");
-        }
     }
 }

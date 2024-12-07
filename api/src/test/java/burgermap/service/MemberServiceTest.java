@@ -246,33 +246,4 @@ class MemberServiceTest {
 
         assertThat(deletedMember).isEqualTo(member);
     }
-
-    @Test
-    @DisplayName("회원 타입이 Owner인지 확인 - Owner인 경우")
-    void isMemberTypeOwner() {
-        // 레포에서 회원 번호로 회원 조회 후 타입 확인 -> Owner인 경우 예외가 발생하지 않음을 검증
-        Long memberId = 1L;
-        Member member = new Member();
-        member.setMemberId(memberId);
-        member.setMemberType(MemberType.OWNER);
-
-        Mockito.when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
-
-        assertThatCode(() -> memberService.isMemberTypeOwner(memberId)).doesNotThrowAnyException();
-    }
-
-    @Test
-    @DisplayName("회원 타입이 Owner인지 확인 - Owner가 아닌 경우")
-    void isNotMemberTypeOwner() {
-        // 레포에서 회원 번호로 회원 조회 후 타입 확인 -> Owner가 아닌 경우 NotOwnerMemberException 발생 검증
-        Long memberId = 1L;
-        Member member = new Member();
-        member.setMemberId(memberId);
-        member.setMemberType(MemberType.CUSTOMER);
-
-        Mockito.when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
-
-        assertThatThrownBy(() -> memberService.isMemberTypeOwner(memberId))
-                .isInstanceOf(NotOwnerMemberException.class);
-    }
 }

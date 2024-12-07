@@ -1,6 +1,8 @@
 package burgermap.controller;
 
 import burgermap.annotation.CheckLogin;
+import burgermap.dto.common.ExceptionMessageDto;
+import burgermap.dto.food.FoodAttributeDto;
 import burgermap.dto.food.FoodInfoDto;
 import burgermap.dto.food.FoodInfoRequestDto;
 import burgermap.dto.food.IngredientInfoDto;
@@ -9,15 +11,19 @@ import burgermap.entity.Food;
 import burgermap.entity.Ingredient;
 import burgermap.entity.MenuCategory;
 import burgermap.enums.MenuType;
+import burgermap.exception.food.FoodAttributeNotExistException;
 import burgermap.service.FoodService;
 import burgermap.session.SessionConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
@@ -29,6 +35,12 @@ import java.util.List;
 public class FoodController {
 
     private final FoodService foodService;
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(FoodAttributeNotExistException.class)
+    public ExceptionMessageDto handleFoodAttributeNotExistException(FoodAttributeNotExistException e) {
+        return new ExceptionMessageDto(e.getMessage());
+    }
 
     @GetMapping("foods/menu-types")
     public ResponseEntity<List<String>> getMenuTypes() {
@@ -50,10 +62,23 @@ public class FoodController {
         return ResponseEntity.ok(ingredientInfoDtoList);
     }
 
+    /**
+     * 음식 속성 정보(메뉴 타입, 메뉴 카테고리, 재료) 조회
+     * @return 음식 속성 정보 DTO
+     */
+    @GetMapping("foods/food-attributes")
+    public ResponseEntity<FoodAttributeDto> getFoodAttributes() {
+        FoodAttributeDto foodAttributeDto = new FoodAttributeDto();
+        foodAttributeDto.setMenuTypes(foodService.getMenuTypes());
+        foodAttributeDto.setMenuCategories(foodService.getMenuCategories().stream().map(this::cvtToMenuCategoryInfoDto).toList());
+        foodAttributeDto.setIngredients(foodService.getIngredients().stream().map(this::cvtToIngredientInfoDto).toList());
+        return ResponseEntity.ok(foodAttributeDto);
+    }
+
     @CheckLogin
     @PostMapping("stores/{storeId}/foods")
     public ResponseEntity<FoodInfoDto> addFood(
-            @SessionAttribute(name = SessionConstants.loginMember) Long memberId,
+            @SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID) Long memberId,
             @PathVariable Long storeId,
             @RequestBody FoodInfoRequestDto foodInfoRequestDto) {
         Food food = cvtToFood(foodInfoRequestDto);
