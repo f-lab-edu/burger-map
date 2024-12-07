@@ -26,4 +26,13 @@ public class StoreLookupService {
             throw new NotOwnerMemberException("member is not owner of the store.");
         }
     }
+
+    /**
+     * storeId에 해당하는 가게가 존재하지 않으면 StoreNotExistException 발생
+     */
+    public void validateStoreExists(Long storeId) {
+        if (!repository.existsByStoreId(storeId)) {
+            throw new StoreNotExistException(storeId);
+        }
+    }
 }
