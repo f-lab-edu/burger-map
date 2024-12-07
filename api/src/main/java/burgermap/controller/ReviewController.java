@@ -67,7 +67,7 @@ public class ReviewController {
 
     @DeleteMapping("reviews/{reviewId}")
     public ResponseEntity<ReviewResponseDto> deleteReview(
-            @SessionAttribute(name = SessionConstants.loginMember) Long memberId,
+            @SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID) Long memberId,
             @PathVariable Long reviewId) {
         Review review = reviewService.deleteReview(reviewId, memberId);
         return ResponseEntity.ok(cvtToReviewResponseDto(review));
