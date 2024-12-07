@@ -42,4 +42,9 @@ public class MySqlFoodRepository implements FoodRepository{
         em.remove(food);
         return Optional.ofNullable(food);
     }
+
+    @Override
+    public void delete(Food food) {
+        em.remove(food);
+    }
 }

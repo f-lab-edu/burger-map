@@ -95,7 +95,7 @@ public class FoodService {
     public Food deleteFood(Long requestMemberId, Long foodId) {
         Food food = foodLookupService.findByFoodId(foodId);
         storeLookupService.checkStoreBelongTo(food.getStore(), requestMemberId);
-        foodRepository.deleteByFoodId(foodId);
+        foodRepository.delete(food);
         log.debug("food deleted: {}", food);
         return food;
     }
