@@ -3,6 +3,7 @@ package burgermap.controller;
 import burgermap.annotation.CheckLogin;
 import burgermap.dto.common.ExceptionMessageDto;
 import burgermap.dto.food.FoodAttributeDto;
+import burgermap.dto.food.FoodFilter;
 import burgermap.dto.food.FoodInfoDto;
 import burgermap.dto.food.FoodInfoRequestDto;
 import burgermap.dto.food.IngredientInfoDto;
@@ -123,6 +124,13 @@ public class FoodController {
             @PathVariable Long foodId) {
         Food food = foodService.deleteFood(memberId, foodId);
         return ResponseEntity.ok(cvtToFoodInfoDto(food));
+    }
+
+    @GetMapping("foods/filter")
+    public ResponseEntity<List<FoodInfoDto>> filterFoods(@RequestBody FoodFilter foodFilter) {
+        List<Food> foods = foodService.filterFoods(foodFilter);
+        List<FoodInfoDto> foodInfoDtoList = foods.stream().map(this::cvtToFoodInfoDto).toList();
+        return ResponseEntity.ok(foodInfoDtoList);
     }
 
     public MenuCategoryInfoDto cvtToMenuCategoryInfoDto(MenuCategory menuCategory) {

@@ -1,5 +1,6 @@
 package burgermap.service;
 
+import burgermap.dto.food.FoodFilter;
 import burgermap.entity.Food;
 import burgermap.entity.Ingredient;
 import burgermap.entity.MenuCategory;
@@ -98,6 +99,10 @@ public class FoodService {
         foodRepository.delete(food);
         log.debug("food deleted: {}", food);
         return food;
+    }
+
+    public List<Food> filterFoods(FoodFilter foodFilter) {
+        return foodRepository.filterFood(foodFilter);
     }
 
 
