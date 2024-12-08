@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
@@ -71,6 +72,18 @@ public class ReviewController {
             @PathVariable Long reviewId) {
         Review review = reviewService.deleteReview(reviewId, memberId);
         return ResponseEntity.ok(cvtToReviewResponseDto(review));
+    }
+
+    // 리뷰 수정
+    @PutMapping("reviews/{reviewId}")
+    public ResponseEntity<ReviewResponseDto> updateReview(
+            @SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID) Long memberId,
+            @PathVariable Long reviewId,
+            @RequestBody ReviewAddRequestDto reviewAddRequestDto
+    ) {
+        Review newReview = cvtToReview(reviewAddRequestDto);
+        Review updatedReview = reviewService.updateReview(memberId, reviewId, newReview);
+        return ResponseEntity.ok(cvtToReviewResponseDto(updatedReview));
     }
 
     // DTO -> Entity

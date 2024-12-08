@@ -63,6 +63,19 @@ public class ReviewService {
         return review;
     }
 
+    @Transactional
+    public Review updateReview(Long memberId, Long reviewId, Review newReview) {
+        Review review = reviewLookupService.findByReviewId(reviewId);
+
+        // 리뷰 작성 회원과 수정 요청 회원이 같은지 확인, 아닌 경우 예외 발생
+        if (!review.getMember().getMemberId().equals(memberId)) {
+            throw new NotReviewAuthorException(reviewId, memberId);
+        }
+
+        review.setContent(newReview.getContent());
+        return review;
+    }
+
     public List<Review> getStoreReviews(Long storeId) {
         return repository.findByStoreId(storeId);
     }

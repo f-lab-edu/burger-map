@@ -1,5 +1,6 @@
 package burgermap.service;
 
+import burgermap.dto.food.FoodFilter;
 import burgermap.entity.Food;
 import burgermap.entity.Ingredient;
 import burgermap.entity.MenuCategory;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FoodService {
     private final StoreService storeService;
+    private final FoodLookupService foodLookupService;
     private final MemberLookupService memberLookupService;
     private final StoreLookupService storeLookupService;
 
@@ -54,6 +56,55 @@ public class FoodService {
 
         return foodRepository.save(food);
     }
+
+    public Food getFood(Long foodId) {
+        Food food = foodLookupService.findByFoodId(foodId);
+        log.debug("food info: {}", food);
+        return food;
+    }
+
+    /**
+     * 특정 가게 엔티티와 관계된 모든 음식 엔티티 조회
+     */
+    public List<Food> getStoreFoods(Long storeId) {
+        storeLookupService.validateStoreExists(storeId);
+        List<Food> foods = foodLookupService.findByStoreId(storeId);
+        log.debug("store {} - foods: {}", storeId, foods);
+        return foods;
+    }
+
+    /**
+     * 음식 엔티티 수정
+     * 요청 회원이 음식이 등록된 가게의 소유자 여부 확인, 음식 엔티티 수정
+     */
+    @Transactional
+    public Food updateFood(Long requestMemberId, Long foodId, Food newFoodInfo) {
+        Food food = foodLookupService.findByFoodId(foodId);
+        storeLookupService.checkStoreBelongTo(food.getStore(), requestMemberId);
+
+        food.setName(newFoodInfo.getName());
+        food.setPrice(newFoodInfo.getPrice());
+        food.setDescription(newFoodInfo.getDescription());
+        food.setMenuType(newFoodInfo.getMenuType());
+        food.setMenuCategory(newFoodInfo.getMenuCategory());
+        food.setIngredients(newFoodInfo.getIngredients());
+
+        return food;
+    }
+
+    @Transactional
+    public Food deleteFood(Long requestMemberId, Long foodId) {
+        Food food = foodLookupService.findByFoodId(foodId);
+        storeLookupService.checkStoreBelongTo(food.getStore(), requestMemberId);
+        foodRepository.delete(food);
+        log.debug("food deleted: {}", food);
+        return food;
+    }
+
+    public List<Food> filterFoods(FoodFilter foodFilter) {
+        return foodRepository.filterFood(foodFilter);
+    }
+
 
     public List<Ingredient> ingredientIdsToIngredients(List<Long> ingredientIds) {
         // ingredientId, Optional<Ingredient> 맵으로 변환

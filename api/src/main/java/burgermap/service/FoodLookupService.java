@@ -6,6 +6,7 @@ import burgermap.repository.FoodRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -25,5 +26,9 @@ public class FoodLookupService {
 
     CompletableFuture<Optional<Food>> findByFoodIdAsync(Long foodId) {
         return CompletableFuture.completedFuture(findByFoodIdPrimitive(foodId));
+    }
+
+    List<Food> findByStoreId(Long storeId) {
+        return repository.findByStoreId(storeId);
     }
 }

@@ -35,4 +35,9 @@ public class MySqlStoreRepository implements StoreRepository {
         repository.deleteById(storeId);
         return store;
     }
+
+    @Override
+    public boolean existsByStoreId(Long storeId) {
+        return repository.existsById(storeId);
+    }
 }

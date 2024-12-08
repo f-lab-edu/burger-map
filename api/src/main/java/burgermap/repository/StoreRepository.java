@@ -10,4 +10,6 @@ public interface StoreRepository {
     public Optional<Store> findByStoreId(Long storeId);
     public List<Store> findByMemberId(Long memberId);
     public Optional<Store> deleteByStoreId(Long storeId);
+
+    public boolean existsByStoreId(Long storeId);
 }
