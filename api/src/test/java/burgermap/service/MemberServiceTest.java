@@ -24,6 +24,8 @@ class MemberServiceTest {
 
     @Mock
     MemberRepository memberRepository;
+    @Mock
+    MemberLookupService memberLookupService;
 
     @Test
     @DisplayName("회원 추가")
@@ -175,7 +177,7 @@ class MemberServiceTest {
         Member member = new Member();
         member.setMemberId(memberId);
 
-        Mockito.when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
+        Mockito.when(memberLookupService.findByMemberId(memberId)).thenReturn(member);
         Member result = memberService.getMyInfo(memberId);
 
         assertThat(result).isEqualTo(member);
@@ -192,7 +194,7 @@ class MemberServiceTest {
         member.setPassword("oldPassword");
         String newPassword = "newPassword";
 
-        Mockito.when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
+        Mockito.when(memberLookupService.findByMemberId(memberId)).thenReturn(member);
         Member result = memberService.changePassword(memberId, newPassword);
 
         assertThat(result.getPassword()).isEqualTo(newPassword);
@@ -209,7 +211,7 @@ class MemberServiceTest {
         member.setEmail("old@gmail.com");
         String newEmail = "new@gmail.com";
 
-        Mockito.when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
+        Mockito.when(memberLookupService.findByMemberId(memberId)).thenReturn(member);
         Member result = memberService.changeEmail(memberId, newEmail);
 
         assertThat(result.getEmail()).isEqualTo(newEmail);
@@ -226,7 +228,7 @@ class MemberServiceTest {
         member.setNickname("oldNickname");
         String newNickname = "newNickname";
 
-        Mockito.when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
+        Mockito.when(memberLookupService.findByMemberId(memberId)).thenReturn(member);
         Member result = memberService.changeNickname(memberId, newNickname);
 
         assertThat(result.getNickname()).isEqualTo(newNickname);
