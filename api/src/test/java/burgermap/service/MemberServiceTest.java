@@ -24,6 +24,8 @@ class MemberServiceTest {
 
     @Mock
     MemberRepository memberRepository;
+    @Mock
+    MemberLookupService memberLookupService;
 
     @Test
     @DisplayName("회원 추가")
@@ -175,7 +177,7 @@ class MemberServiceTest {
         Member member = new Member();
         member.setMemberId(memberId);
 
-        Mockito.when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
+        Mockito.when(memberLookupService.findByMemberId(memberId)).thenReturn(member);
         Member result = memberService.getMyInfo(memberId);
 
         assertThat(result).isEqualTo(member);
@@ -192,7 +194,7 @@ class MemberServiceTest {
         member.setPassword("oldPassword");
         String newPassword = "newPassword";
 
-        Mockito.when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
+        Mockito.when(memberLookupService.findByMemberId(memberId)).thenReturn(member);
         Member result = memberService.changePassword(memberId, newPassword);
 
         assertThat(result.getPassword()).isEqualTo(newPassword);
@@ -209,7 +211,7 @@ class MemberServiceTest {
         member.setEmail("old@gmail.com");
         String newEmail = "new@gmail.com";
 
-        Mockito.when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
+        Mockito.when(memberLookupService.findByMemberId(memberId)).thenReturn(member);
         Member result = memberService.changeEmail(memberId, newEmail);
 
         assertThat(result.getEmail()).isEqualTo(newEmail);
@@ -226,7 +228,7 @@ class MemberServiceTest {
         member.setNickname("oldNickname");
         String newNickname = "newNickname";
 
-        Mockito.when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
+        Mockito.when(memberLookupService.findByMemberId(memberId)).thenReturn(member);
         Member result = memberService.changeNickname(memberId, newNickname);
 
         assertThat(result.getNickname()).isEqualTo(newNickname);
@@ -245,34 +247,5 @@ class MemberServiceTest {
         Member deletedMember = memberService.deleteMember(memberId);
 
         assertThat(deletedMember).isEqualTo(member);
-    }
-
-    @Test
-    @DisplayName("회원 타입이 Owner인지 확인 - Owner인 경우")
-    void isMemberTypeOwner() {
-        // 레포에서 회원 번호로 회원 조회 후 타입 확인 -> Owner인 경우 예외가 발생하지 않음을 검증
-        Long memberId = 1L;
-        Member member = new Member();
-        member.setMemberId(memberId);
-        member.setMemberType(MemberType.OWNER);
-
-        Mockito.when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
-
-        assertThatCode(() -> memberService.isMemberTypeOwner(memberId)).doesNotThrowAnyException();
-    }
-
-    @Test
-    @DisplayName("회원 타입이 Owner인지 확인 - Owner가 아닌 경우")
-    void isNotMemberTypeOwner() {
-        // 레포에서 회원 번호로 회원 조회 후 타입 확인 -> Owner가 아닌 경우 NotOwnerMemberException 발생 검증
-        Long memberId = 1L;
-        Member member = new Member();
-        member.setMemberId(memberId);
-        member.setMemberType(MemberType.CUSTOMER);
-
-        Mockito.when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
-
-        assertThatThrownBy(() -> memberService.isMemberTypeOwner(memberId))
-                .isInstanceOf(NotOwnerMemberException.class);
     }
 }

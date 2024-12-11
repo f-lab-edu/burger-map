@@ -1,20 +1,15 @@
 package burgermap.service;
 
+import burgermap.dto.food.FoodFilter;
 import burgermap.entity.Food;
 import burgermap.entity.Ingredient;
-import burgermap.entity.Member;
 import burgermap.entity.MenuCategory;
 import burgermap.entity.Store;
-import burgermap.enums.MemberType;
 import burgermap.enums.MenuType;
 import burgermap.exception.food.FoodAttributeNotExistException;
-import burgermap.exception.store.NotOwnerMemberException;
-import burgermap.exception.store.StoreNotExistException;
 import burgermap.repository.FoodRepository;
 import burgermap.repository.IngredientRepository;
-import burgermap.repository.MemberRepository;
 import burgermap.repository.MenuCategoryRepository;
-import burgermap.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,15 +20,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
-@Transactional
 @Slf4j
 @RequiredArgsConstructor
 public class FoodService {
-    private final MemberService memberService;
     private final StoreService storeService;
+    private final FoodLookupService foodLookupService;
+    private final MemberLookupService memberLookupService;
+    private final StoreLookupService storeLookupService;
 
     private final IngredientRepository ingredientRepository;
     private final MenuCategoryRepository menuCategoryRepository;
@@ -51,15 +46,65 @@ public class FoodService {
         return ingredientRepository.findAll();
     }
 
+    @Transactional
     public Food addFood(Food food, Long storeId, Long memberId) {
-        memberService.isMemberTypeOwner(memberId);
-        Store store = storeService.checkStoreExistence(storeId);
-        storeService.checkStoreBelongTo(store, memberId);
+        memberLookupService.isMemberTypeOwner(memberId);
+        Store store = storeLookupService.findByStoreId(storeId);
+        storeLookupService.checkStoreBelongTo(store, memberId);
 
         food.setStore(store);
 
         return foodRepository.save(food);
     }
+
+    public Food getFood(Long foodId) {
+        Food food = foodLookupService.findByFoodId(foodId);
+        log.debug("food info: {}", food);
+        return food;
+    }
+
+    /**
+     * 특정 가게 엔티티와 관계된 모든 음식 엔티티 조회
+     */
+    public List<Food> getStoreFoods(Long storeId) {
+        storeLookupService.validateStoreExists(storeId);
+        List<Food> foods = foodLookupService.findByStoreId(storeId);
+        log.debug("store {} - foods: {}", storeId, foods);
+        return foods;
+    }
+
+    /**
+     * 음식 엔티티 수정
+     * 요청 회원이 음식이 등록된 가게의 소유자 여부 확인, 음식 엔티티 수정
+     */
+    @Transactional
+    public Food updateFood(Long requestMemberId, Long foodId, Food newFoodInfo) {
+        Food food = foodLookupService.findByFoodId(foodId);
+        storeLookupService.checkStoreBelongTo(food.getStore(), requestMemberId);
+
+        food.setName(newFoodInfo.getName());
+        food.setPrice(newFoodInfo.getPrice());
+        food.setDescription(newFoodInfo.getDescription());
+        food.setMenuType(newFoodInfo.getMenuType());
+        food.setMenuCategory(newFoodInfo.getMenuCategory());
+        food.setIngredients(newFoodInfo.getIngredients());
+
+        return food;
+    }
+
+    @Transactional
+    public Food deleteFood(Long requestMemberId, Long foodId) {
+        Food food = foodLookupService.findByFoodId(foodId);
+        storeLookupService.checkStoreBelongTo(food.getStore(), requestMemberId);
+        foodRepository.delete(food);
+        log.debug("food deleted: {}", food);
+        return food;
+    }
+
+    public List<Food> filterFoods(FoodFilter foodFilter) {
+        return foodRepository.filterFood(foodFilter);
+    }
+
 
     public List<Ingredient> ingredientIdsToIngredients(List<Long> ingredientIds) {
         // ingredientId, Optional<Ingredient> 맵으로 변환
