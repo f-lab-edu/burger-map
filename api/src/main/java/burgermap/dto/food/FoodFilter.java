@@ -10,6 +10,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class FoodFilter {
+    private List<Long> storeIds;
     private Long menuCategoryId;
     private List<Long> ingredientIds;
 }

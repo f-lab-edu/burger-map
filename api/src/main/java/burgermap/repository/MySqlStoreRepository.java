@@ -40,4 +40,9 @@ public class MySqlStoreRepository implements StoreRepository {
     public boolean existsByStoreId(Long storeId) {
         return repository.existsById(storeId);
     }
+
+    @Override
+    public List<Store> findByGeoRange(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude) {
+        return repository.findByLatitudeBetweenAndLongitudeBetween(minLatitude, maxLatitude, minLongitude, maxLongitude);
+    }
 }

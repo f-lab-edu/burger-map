@@ -12,4 +12,5 @@ public interface StoreRepository {
     public Optional<Store> deleteByStoreId(Long storeId);
 
     public boolean existsByStoreId(Long storeId);
+    public List<Store> findByGeoRange(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude);
 }

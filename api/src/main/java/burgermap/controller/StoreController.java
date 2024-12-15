@@ -1,9 +1,14 @@
 package burgermap.controller;
 
 import burgermap.annotation.CheckLogin;
+import burgermap.dto.food.FoodFilter;
+import burgermap.dto.geo.GeoLocationRange;
 import burgermap.dto.store.StoreInfoDto;
 import burgermap.dto.store.StoreRequestDto;
+import burgermap.dto.store.StoreSearchResultDto;
+import burgermap.entity.Food;
 import burgermap.entity.Store;
+import burgermap.service.FoodService;
 import burgermap.service.StoreService;
 import burgermap.session.SessionConstants;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +24,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,6 +36,7 @@ import java.util.List;
 public class StoreController {
 
     private final StoreService storeService;
+    private final FoodService foodService;
 
     /**
      * 가게 추가
@@ -52,17 +61,33 @@ public class StoreController {
     }
 
     /**
-     * 조건을 만족하는 가게 조회
-     *   - 주어진 위치에서 설정한 거리 내에 있는 가게 조회
-     *   - 패티 종류, 번 종류에 따라 가게 조회
-     *   - 사이드 메뉴 종류에 따라 가게 조회
+     * 특정 위경도 범위 내 가게 조회
+     *
+     * @param geoLocationRange 위경도 범위 정보(최소 위도, 최대 위도, 최소 경도, 최대 경도)
      */
-/*
-    @GetMapping
-    public ResponseEntity<List<StoreInfoDto>> getStores() {
-        return ResponseEntity.ok(null);
+    @PostMapping("/search")
+    public ResponseEntity<StoreSearchResultDto> getStores(
+            @RequestBody GeoLocationRange geoLocationRange,
+            @RequestBody FoodFilter foodFilter
+    ) {
+        List<Store> stores = storeService.getStores(geoLocationRange);
+        List<Food> foods = new ArrayList<>();
+
+        foodFilter.setStoreIds(stores.stream().map(Store::getStoreId).toList());
+        StoreSearchResultDto storeSearchResultDto = new StoreSearchResultDto();
+
+        boolean isFilterValid = foodFilter.getMenuCategoryId() != null || !foodFilter.getIngredientIds().isEmpty();
+        if (!stores.isEmpty() && isFilterValid) {
+            foods = foodService.filterFoods(foodFilter);
+
+            Map<Long, Store> storeMap = stores.stream().collect(Collectors.toMap(Store::getStoreId, store -> store));
+            stores = foods.stream().map(food -> storeMap.get(food.getStore().getStoreId())).toList();
+        }
+        storeSearchResultDto.setStoreInfos(stores.stream().map(this::cvtToStoreInfoDto).toList());
+        // TODO: 음식 정보를 추가해야 함
+        // 음식 엔티티를 DTO로 변환하는 메서드는 FoodController에 존재 -> 컨트롤러간에 참조가 생기면 구조가 복잡해질 수 있음.
+        return ResponseEntity.ok(storeSearchResultDto);
     }
-*/
 
     /**
      * OWNER 회원이 등록한 모든 가게 정보 조회

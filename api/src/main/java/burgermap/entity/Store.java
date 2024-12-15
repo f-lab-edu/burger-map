@@ -27,4 +27,6 @@ public class Store {
     private String address;
     private String phone;
     private String introduction;
+    private double latitude;
+    private double longitude;
 }

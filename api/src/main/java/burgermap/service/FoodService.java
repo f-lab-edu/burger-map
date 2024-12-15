@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class FoodService {
-    private final StoreService storeService;
     private final FoodLookupService foodLookupService;
     private final MemberLookupService memberLookupService;
     private final StoreLookupService storeLookupService;

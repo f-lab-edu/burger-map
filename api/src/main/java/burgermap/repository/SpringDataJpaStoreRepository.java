@@ -11,4 +11,6 @@ public interface SpringDataJpaStoreRepository extends JpaRepository<Store, Long>
 
     @Query("select s from Store s where s.member.memberId = :memberId")
     List<Store> findByMemberId(@Param("memberId") Long memberId);
+
+    List<Store> findByLatitudeBetweenAndLongitudeBetween(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude);
 }
