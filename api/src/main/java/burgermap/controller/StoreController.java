@@ -1,10 +1,14 @@
 package burgermap.controller;
 
 import burgermap.annotation.CheckLogin;
+import burgermap.dto.food.FoodFilter;
 import burgermap.dto.geo.GeoLocationRange;
 import burgermap.dto.store.StoreInfoDto;
 import burgermap.dto.store.StoreRequestDto;
+import burgermap.dto.store.StoreSearchResultDto;
+import burgermap.entity.Food;
 import burgermap.entity.Store;
+import burgermap.service.FoodService;
 import burgermap.service.StoreService;
 import burgermap.session.SessionConstants;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -21,7 +24,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -30,6 +36,7 @@ import java.util.List;
 public class StoreController {
 
     private final StoreService storeService;
+    private final FoodService foodService;
 
     /**
      * 가게 추가
@@ -58,10 +65,28 @@ public class StoreController {
      *
      * @param geoLocationRange 위경도 범위 정보(최소 위도, 최대 위도, 최소 경도, 최대 경도)
      */
-    @GetMapping
-    public ResponseEntity<List<StoreInfoDto>> getStores(@ModelAttribute GeoLocationRange geoLocationRange) {
+    @PostMapping("/search")
+    public ResponseEntity<StoreSearchResultDto> getStores(
+            @RequestBody GeoLocationRange geoLocationRange,
+            @RequestBody FoodFilter foodFilter
+    ) {
         List<Store> stores = storeService.getStores(geoLocationRange);
-        return ResponseEntity.ok(stores.stream().map(this::cvtToStoreInfoDto).toList());
+        List<Food> foods = new ArrayList<>();
+
+        foodFilter.setStoreIds(stores.stream().map(Store::getStoreId).toList());
+        StoreSearchResultDto storeSearchResultDto = new StoreSearchResultDto();
+
+        boolean isFilterValid = foodFilter.getMenuCategoryId() != null || !foodFilter.getIngredientIds().isEmpty();
+        if (!stores.isEmpty() && isFilterValid) {
+            foods = foodService.filterFoods(foodFilter);
+
+            Map<Long, Store> storeMap = stores.stream().collect(Collectors.toMap(Store::getStoreId, store -> store));
+            stores = foods.stream().map(food -> storeMap.get(food.getStore().getStoreId())).toList();
+        }
+        storeSearchResultDto.setStoreInfos(stores.stream().map(this::cvtToStoreInfoDto).toList());
+        // TODO: 음식 정보를 추가해야 함
+        // 음식 엔티티를 DTO로 변환하는 메서드는 FoodController에 존재 -> 컨트롤러간에 참조가 생기면 구조가 복잡해질 수 있음.
+        return ResponseEntity.ok(storeSearchResultDto);
     }
 
     /**
