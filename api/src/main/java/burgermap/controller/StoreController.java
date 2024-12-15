@@ -1,6 +1,7 @@
 package burgermap.controller;
 
 import burgermap.annotation.CheckLogin;
+import burgermap.dto.geo.GeoLocationRange;
 import burgermap.dto.store.StoreInfoDto;
 import burgermap.dto.store.StoreRequestDto;
 import burgermap.entity.Store;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -52,17 +54,15 @@ public class StoreController {
     }
 
     /**
-     * 조건을 만족하는 가게 조회
-     *   - 주어진 위치에서 설정한 거리 내에 있는 가게 조회
-     *   - 패티 종류, 번 종류에 따라 가게 조회
-     *   - 사이드 메뉴 종류에 따라 가게 조회
+     * 특정 위경도 범위 내 가게 조회
+     *
+     * @param geoLocationRange 위경도 범위 정보(최소 위도, 최대 위도, 최소 경도, 최대 경도)
      */
-/*
     @GetMapping
-    public ResponseEntity<List<StoreInfoDto>> getStores() {
-        return ResponseEntity.ok(null);
+    public ResponseEntity<List<StoreInfoDto>> getStores(@ModelAttribute GeoLocationRange geoLocationRange) {
+        List<Store> stores = storeService.getStores(geoLocationRange);
+        return ResponseEntity.ok(stores.stream().map(this::cvtToStoreInfoDto).toList());
     }
-*/
 
     /**
      * OWNER 회원이 등록한 모든 가게 정보 조회

@@ -1,6 +1,7 @@
 package burgermap.service;
 
 import burgermap.dto.geo.GeoLocation;
+import burgermap.dto.geo.GeoLocationRange;
 import burgermap.entity.Member;
 import burgermap.entity.Store;
 import burgermap.repository.StoreRepository;
@@ -40,6 +41,15 @@ public class StoreService {
         Store store = storeLookupService.findByStoreId(storeId);
         log.debug("store info: {}", store);
         return store;
+    }
+
+    public List<Store> getStores(GeoLocationRange geoLocationRange) {
+        return storeRepository.findByGeoRange(
+                geoLocationRange.getMinLatitude(),
+                geoLocationRange.getMaxLatitude(),
+                geoLocationRange.getMinLongitude(),
+                geoLocationRange.getMaxLongitude()
+        );
     }
 
     public List<Store> getMyStores(Long memberId) {
