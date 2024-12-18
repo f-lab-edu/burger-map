@@ -9,6 +9,7 @@ import burgermap.dto.member.MemberJoinRequestDto;
 import burgermap.dto.member.MemberJoinResponseDto;
 import burgermap.dto.member.MemberLoginDto;
 import burgermap.entity.Member;
+import burgermap.mapper.composite.MemberMapper;
 import burgermap.service.ImageService;
 import burgermap.service.MemberService;
 import burgermap.session.SessionConstants;
@@ -31,26 +32,27 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import java.util.Map;
 import java.util.Optional;
 
+import static burgermap.constants.MemberConstants.IMAGE_DIRECTORY_PATH;
+
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("members")
 public class MemberController {
-    private static final String IMAGE_DIRECTORY_PATH = "profile-images";
-
     private final MemberService memberService;
     private final ImageService imageService;
 
+    private final MemberMapper memberMapper;
 
     /**
      * 회원 추가
      */
     @PostMapping
     public MemberJoinResponseDto addMember(@RequestBody MemberJoinRequestDto memberJoinRequestDto) {
-        Member member = cvtToMember(memberJoinRequestDto);
+        Member member = memberMapper.fromDto(memberJoinRequestDto);
         memberService.addMember(member, memberJoinRequestDto.getProfileImageName());
-        return cvtToMemberJoinResponseDto(member);
+        return memberMapper.toMemberJoinResponseDto(member);
     }
 
     @PostMapping("/image-upload-url")
@@ -122,7 +124,7 @@ public class MemberController {
     @GetMapping("/my-info")
     public ResponseEntity<MemberInfoDto> getMyInfo(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID, required = false) Long memberId) {
         Member member = memberService.getMyInfo(memberId);
-        MemberInfoDto memberInfoDto = cvtToMemberInfoDto(member);
+        MemberInfoDto memberInfoDto = memberMapper.toMemberInfoDto(member);
         return ResponseEntity.ok(memberInfoDto);
     }
 
@@ -134,7 +136,7 @@ public class MemberController {
     @PatchMapping("/my-info/password")
     public ResponseEntity<MemberInfoDto> changePassword(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID, required = false) Long memberId, @RequestBody MemberChangeableInfoDto memberChangeableInfoDto) {
         Member member = memberService.changePassword(memberId, memberChangeableInfoDto.getPassword());
-        return ResponseEntity.ok(cvtToMemberInfoDto(member));
+        return ResponseEntity.ok(memberMapper.toMemberInfoDto(member));
     }
 
     /**
@@ -145,14 +147,14 @@ public class MemberController {
     @PatchMapping("/my-info/email")
     public ResponseEntity<MemberInfoDto> changeEmail(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID, required = false) Long memberId, @RequestBody MemberChangeableInfoDto memberChangeableInfoDto) {
         Member member = memberService.changeEmail(memberId, memberChangeableInfoDto.getEmail());
-        return ResponseEntity.ok(cvtToMemberInfoDto(member));
+        return ResponseEntity.ok(memberMapper.toMemberInfoDto(member));
     }
 
     @CheckLogin
     @PatchMapping("/my-info/profile-image")
     public ResponseEntity<MemberInfoDto> changeProfileImage(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID, required = false) Long memberId, @RequestBody MemberChangeableInfoDto memberChangeableInfoDto) {
         Member member = memberService.changeProfileImage(memberId, memberChangeableInfoDto.getProfileImageName());
-        return ResponseEntity.ok(cvtToMemberInfoDto(member));
+        return ResponseEntity.ok(memberMapper.toMemberInfoDto(member));
     }
 
     /**
@@ -163,7 +165,7 @@ public class MemberController {
     @PatchMapping("/my-info/nickname")
     public ResponseEntity<MemberInfoDto> changeNickname(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID, required = false) Long memberId, @RequestBody MemberChangeableInfoDto memberChangeableInfoDto) {
         Member member = memberService.changeNickname(memberId, memberChangeableInfoDto.getNickname());
-        return ResponseEntity.ok(cvtToMemberInfoDto(member));
+        return ResponseEntity.ok(memberMapper.toMemberInfoDto(member));
     }
 
     /**
@@ -177,47 +179,6 @@ public class MemberController {
         Member deletedMember = memberService.deleteMember(memberId);
         request.getSession(false).invalidate();  // 삭제와 동시에 로그아웃
 
-        return ResponseEntity.ok(cvtToMemberInfoDto(deletedMember));
-    }
-
-    private Member cvtToMember(MemberJoinRequestDto memberJoinRequestDto) {
-        Member member = new Member();
-        member.setMemberType(memberJoinRequestDto.getMemberType());
-        member.setLoginId(memberJoinRequestDto.getLoginId());
-        member.setPassword(memberJoinRequestDto.getPassword());
-        member.setEmail(memberJoinRequestDto.getEmail());
-        member.setNickname(memberJoinRequestDto.getNickname());
-
-        return member;
-    }
-
-    private MemberInfoDto cvtToMemberInfoDto(Member member) {
-        MemberInfoDto memberInfoDto = new MemberInfoDto();
-        memberInfoDto.setMemberType(member.getMemberType());
-        memberInfoDto.setLoginId(member.getLoginId());
-        memberInfoDto.setEmail(member.getEmail());
-        memberInfoDto.setNickname(member.getNickname());
-
-        if (member.getProfileImage() != null) {
-            String profileImageUrl = imageService.getImageUrl(
-                    IMAGE_DIRECTORY_PATH, member.getProfileImage().getImageName()).orElse(null);
-            memberInfoDto.setProfileImageUrl(profileImageUrl);
-        }
-        return memberInfoDto;
-    }
-
-    private MemberJoinResponseDto cvtToMemberJoinResponseDto(Member member) {
-        MemberJoinResponseDto memberJoinResponseDto = new MemberJoinResponseDto();
-        memberJoinResponseDto.setMemberType(member.getMemberType());
-        memberJoinResponseDto.setLoginId(member.getLoginId());
-        memberJoinResponseDto.setEmail(member.getEmail());
-        memberJoinResponseDto.setNickname(member.getNickname());
-
-        if (member.getProfileImage() != null) {
-            String profileImageUrl = imageService.getImageUrl(
-                    IMAGE_DIRECTORY_PATH, member.getProfileImage().getImageName()).orElse(null);
-            memberJoinResponseDto.setProfileImageUrl(profileImageUrl);
-        }
-        return memberJoinResponseDto;
+        return ResponseEntity.ok(memberMapper.toMemberInfoDto(deletedMember));
     }
 }
