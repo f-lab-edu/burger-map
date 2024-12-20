@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,4 +30,12 @@ public class Store {
     private String introduction;
     private double latitude;
     private double longitude;
+
+    @Builder
+    public Store(String name, String address, String phone, String introduction) {
+        this.name = name;
+        this.address = address;
+        this.phone = phone;
+        this.introduction = introduction;
+    }
 }

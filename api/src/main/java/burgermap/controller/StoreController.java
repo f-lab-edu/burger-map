@@ -8,6 +8,7 @@ import burgermap.dto.store.StoreRequestDto;
 import burgermap.dto.store.StoreSearchResultDto;
 import burgermap.entity.Food;
 import burgermap.entity.Store;
+import burgermap.mapper.StoreMapper;
 import burgermap.service.FoodService;
 import burgermap.service.StoreService;
 import burgermap.session.SessionConstants;
@@ -38,6 +39,8 @@ public class StoreController {
     private final StoreService storeService;
     private final FoodService foodService;
 
+    private final StoreMapper storeMapper;
+
     /**
      * 가게 추가
      */
@@ -45,10 +48,10 @@ public class StoreController {
     @PostMapping
     public ResponseEntity<StoreInfoDto> addStore(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID, required = false) Long memberId,
                                                  @RequestBody StoreRequestDto storeRequestDto) {
-        Store store = cvtToStore(storeRequestDto);
+        Store store = storeMapper.fromDto(storeRequestDto);
         storeService.addStore(store, memberId);
         System.out.println("store = " + store);
-        return ResponseEntity.ok(cvtToStoreInfoDto(store));
+        return ResponseEntity.ok(storeMapper.toStoreInfoDto(store));
     }
 
     /**
@@ -57,7 +60,7 @@ public class StoreController {
     @GetMapping("/{storeId}")
     public ResponseEntity<StoreInfoDto> getStore(@PathVariable Long storeId) {
         Store store = storeService.getStore(storeId);
-        return ResponseEntity.ok(cvtToStoreInfoDto(store));
+        return ResponseEntity.ok(storeMapper.toStoreInfoDto(store));
     }
 
     /**
@@ -83,7 +86,7 @@ public class StoreController {
             Map<Long, Store> storeMap = stores.stream().collect(Collectors.toMap(Store::getStoreId, store -> store));
             stores = foods.stream().map(food -> storeMap.get(food.getStore().getStoreId())).toList();
         }
-        storeSearchResultDto.setStoreInfos(stores.stream().map(this::cvtToStoreInfoDto).toList());
+        storeSearchResultDto.setStoreInfos(stores.stream().map(storeMapper::toStoreInfoDto).toList());
         // TODO: 음식 정보를 추가해야 함
         // 음식 엔티티를 DTO로 변환하는 메서드는 FoodController에 존재 -> 컨트롤러간에 참조가 생기면 구조가 복잡해질 수 있음.
         return ResponseEntity.ok(storeSearchResultDto);
@@ -96,7 +99,7 @@ public class StoreController {
     @GetMapping("/my-stores")
     public ResponseEntity<List<StoreInfoDto>> getMyStores(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID, required = false) Long memberId) {
         List<Store> stores = storeService.getMyStores(memberId);
-        List<StoreInfoDto> storeDtolist = stores.stream().map(store -> cvtToStoreInfoDto(store)).toList();
+        List<StoreInfoDto> storeDtolist = stores.stream().map(storeMapper::toStoreInfoDto).toList();
         return ResponseEntity.ok(storeDtolist);
     }
 
@@ -108,9 +111,9 @@ public class StoreController {
     public ResponseEntity<StoreInfoDto> updateStore(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID, required = false) Long memberId,
                                                     @PathVariable Long storeId,
                                                     @RequestBody StoreRequestDto storeRequestDto) {
-        Store newStoreInfo = cvtToStore(storeRequestDto);
+        Store newStoreInfo = storeMapper.fromDto(storeRequestDto);
         Store newStore = storeService.updateStore(memberId, storeId, newStoreInfo);
-        return ResponseEntity.ok(cvtToStoreInfoDto(newStore));
+        return ResponseEntity.ok(storeMapper.toStoreInfoDto(newStore));
     }
 
     /**
@@ -121,30 +124,6 @@ public class StoreController {
     public ResponseEntity<StoreInfoDto> deleteStore(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID, required = false) Long memberId,
                                                     @PathVariable Long storeId) {
         Store store = storeService.deleteStore(memberId, storeId);
-        return ResponseEntity.ok(cvtToStoreInfoDto(store));
-    }
-
-    public Store cvtToStore(Object storeDto) {
-        Store store = new Store();
-
-        if (storeDto instanceof StoreRequestDto storeRequestDto) {
-            store.setName(storeRequestDto.getName());
-            store.setAddress(storeRequestDto.getAddress());
-            store.setPhone(storeRequestDto.getPhone());
-            store.setIntroduction(storeRequestDto.getIntroduction());
-            // member 필드는 서비스 레이어에서 설정
-        }
-
-        return store;
-    }
-
-    public StoreInfoDto cvtToStoreInfoDto(Store store) {
-        StoreInfoDto storeInfoDto = new StoreInfoDto();
-        storeInfoDto.setStoreId(store.getStoreId());
-        storeInfoDto.setName(store.getName());
-        storeInfoDto.setAddress(store.getAddress());
-        storeInfoDto.setPhone(store.getPhone());
-        storeInfoDto.setIntroduction(store.getIntroduction());
-        return storeInfoDto;
+        return ResponseEntity.ok(storeMapper.toStoreInfoDto(store));
     }
 }
