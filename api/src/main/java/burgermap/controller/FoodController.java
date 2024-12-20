@@ -85,7 +85,9 @@ public class FoodController {
             @PathVariable Long storeId,
             @RequestBody FoodInfoRequestDto foodInfoRequestDto) {
         Food food = cvtToFood(foodInfoRequestDto);
-        Food addedFood = foodService.addFood(food, storeId, memberId);
+        Long menuCategoryId = foodInfoRequestDto.getMenuCategoryId();
+        List<Long> ingredientIds = foodInfoRequestDto.getIngredientIds();
+        Food addedFood = foodService.addFood(food, menuCategoryId, ingredientIds, storeId, memberId);
         return ResponseEntity.ok(cvtToFoodInfoDto(addedFood));
     }
 
@@ -114,7 +116,9 @@ public class FoodController {
             @PathVariable Long foodId,
             @RequestBody FoodInfoRequestDto foodInfoRequestDto) {
         Food newFoodInfo = cvtToFood(foodInfoRequestDto);
-        Food newFood = foodService.updateFood(memberId, foodId, newFoodInfo);
+        Long menuCategoryId = foodInfoRequestDto.getMenuCategoryId();
+        List<Long> ingredientIds = foodInfoRequestDto.getIngredientIds();
+        Food newFood = foodService.updateFood(memberId, foodId, newFoodInfo, menuCategoryId, ingredientIds);
         return ResponseEntity.ok(cvtToFoodInfoDto(newFood));
     }
 
@@ -153,8 +157,6 @@ public class FoodController {
         food.setPrice(foodInfoRequestDto.getPrice());
         food.setDescription(foodInfoRequestDto.getDescription());
         food.setMenuType(MenuType.from(foodInfoRequestDto.getMenuTypeValue()));
-        food.setMenuCategory(foodService.menuCategoryIdToMenuCategory(foodInfoRequestDto.getMenuCategoryId()));
-        food.setIngredients(foodService.ingredientIdsToIngredients(foodInfoRequestDto.getIngredientIds()));
         return food;
     }
 
