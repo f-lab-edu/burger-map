@@ -9,7 +9,7 @@ import burgermap.dto.member.MemberJoinRequestDto;
 import burgermap.dto.member.MemberJoinResponseDto;
 import burgermap.dto.member.MemberLoginDto;
 import burgermap.entity.Member;
-import burgermap.mapper.composite.MemberMapper;
+import burgermap.mapper.MemberMapper;
 import burgermap.service.ImageService;
 import burgermap.service.MemberService;
 import burgermap.session.SessionConstants;

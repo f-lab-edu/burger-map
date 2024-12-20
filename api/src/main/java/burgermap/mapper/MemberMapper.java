@@ -1,4 +1,4 @@
-package burgermap.mapper.composite;
+package burgermap.mapper;
 
 import burgermap.dto.member.MemberInfoDto;
 import burgermap.dto.member.MemberJoinRequestDto;
