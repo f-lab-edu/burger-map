@@ -2,14 +2,21 @@ package burgermap.mapper;
 
 import burgermap.dto.store.StoreInfoDto;
 import burgermap.dto.store.StoreRequestDto;
+import burgermap.dto.store.StoreSearchResponseDto;
+import burgermap.dto.store.StoresWithFoodsEntityWrapper;
 import burgermap.entity.Store;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
  * Store 엔티티와 관련 DTO간의 양방향 맵핑을 제공하는 클래스.
  */
 @Component
+@RequiredArgsConstructor
 public class StoreMapper {
+
+    private final FoodMapper foodMapper;
+
     public Store fromDto(StoreRequestDto storeRequestDto) {
         return Store.builder()
                 .name(storeRequestDto.getName())
@@ -27,5 +34,12 @@ public class StoreMapper {
                 .phone(store.getPhone())
                 .introduction(store.getIntroduction())
                 .build();
+    }
+
+    public StoreSearchResponseDto toStoreSearchResultDto(StoresWithFoodsEntityWrapper storesWithFoodsEntityWrapper) {
+        return new StoreSearchResponseDto(
+                storesWithFoodsEntityWrapper.getStores().stream().map(this::toStoreInfoDto).toList(),
+                storesWithFoodsEntityWrapper.getFoods().stream().map(foodMapper::toFoodInfoDto).toList()
+        );
     }
 }
