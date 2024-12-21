@@ -2,6 +2,8 @@ package burgermap.dto.food;
 
 import burgermap.entity.Ingredient;
 import burgermap.entity.MenuCategory;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +15,8 @@ import java.util.List;
 @Setter
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class FoodInfoDto {
     private Long foodId;
     private Long storeId;

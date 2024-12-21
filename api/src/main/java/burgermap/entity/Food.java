@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,4 +34,12 @@ public class Food {
     private MenuCategory menuCategory;
     @ManyToMany
     private List<Ingredient> ingredients;
+
+    @Builder
+    public Food(String name, int price, String description, String menuTypeValue) {
+        this.name = name;
+        this.price = price;
+        this.description = description;
+        this.menuType = MenuType.from(menuTypeValue);
+    }
 }

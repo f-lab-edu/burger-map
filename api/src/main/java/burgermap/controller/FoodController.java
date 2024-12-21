@@ -11,8 +11,8 @@ import burgermap.dto.food.MenuCategoryInfoDto;
 import burgermap.entity.Food;
 import burgermap.entity.Ingredient;
 import burgermap.entity.MenuCategory;
-import burgermap.enums.MenuType;
 import burgermap.exception.food.FoodAttributeNotExistException;
+import burgermap.mapper.FoodMapper;
 import burgermap.service.FoodService;
 import burgermap.session.SessionConstants;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +39,8 @@ public class FoodController {
 
     private final FoodService foodService;
 
+    private final FoodMapper foodMapper;
+
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(FoodAttributeNotExistException.class)
     public ExceptionMessageDto handleFoodAttributeNotExistException(FoodAttributeNotExistException e) {
@@ -54,14 +56,14 @@ public class FoodController {
     @GetMapping("foods/menu-categories")
     public ResponseEntity<List<MenuCategoryInfoDto>> getMenuCategories() {
         List<MenuCategory> menuCategories = foodService.getMenuCategories();
-        List<MenuCategoryInfoDto> menuCategoryInfoDtolist = menuCategories.stream().map(this::cvtToMenuCategoryInfoDto).toList();
+        List<MenuCategoryInfoDto> menuCategoryInfoDtolist = menuCategories.stream().map(foodMapper::toMenuCategoryInfoDto).toList();
         return ResponseEntity.ok(menuCategoryInfoDtolist);
     }
 
     @GetMapping("foods/ingredients")
     public ResponseEntity<List<IngredientInfoDto>> getIngredients() {
         List<Ingredient> ingredients = foodService.getIngredients();
-        List<IngredientInfoDto> ingredientInfoDtoList = ingredients.stream().map(this::cvtToIngredientInfoDto).toList();
+        List<IngredientInfoDto> ingredientInfoDtoList = ingredients.stream().map(foodMapper::toIngredientInfoDto).toList();
         return ResponseEntity.ok(ingredientInfoDtoList);
     }
 
@@ -73,8 +75,8 @@ public class FoodController {
     public ResponseEntity<FoodAttributeDto> getFoodAttributes() {
         FoodAttributeDto foodAttributeDto = new FoodAttributeDto();
         foodAttributeDto.setMenuTypes(foodService.getMenuTypes());
-        foodAttributeDto.setMenuCategories(foodService.getMenuCategories().stream().map(this::cvtToMenuCategoryInfoDto).toList());
-        foodAttributeDto.setIngredients(foodService.getIngredients().stream().map(this::cvtToIngredientInfoDto).toList());
+        foodAttributeDto.setMenuCategories(foodService.getMenuCategories().stream().map(foodMapper::toMenuCategoryInfoDto).toList());
+        foodAttributeDto.setIngredients(foodService.getIngredients().stream().map(foodMapper::toIngredientInfoDto).toList());
         return ResponseEntity.ok(foodAttributeDto);
     }
 
@@ -84,17 +86,17 @@ public class FoodController {
             @SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID) Long memberId,
             @PathVariable Long storeId,
             @RequestBody FoodInfoRequestDto foodInfoRequestDto) {
-        Food food = cvtToFood(foodInfoRequestDto);
+        Food food = foodMapper.fromDto(foodInfoRequestDto);
         Long menuCategoryId = foodInfoRequestDto.getMenuCategoryId();
         List<Long> ingredientIds = foodInfoRequestDto.getIngredientIds();
         Food addedFood = foodService.addFood(food, menuCategoryId, ingredientIds, storeId, memberId);
-        return ResponseEntity.ok(cvtToFoodInfoDto(addedFood));
+        return ResponseEntity.ok(foodMapper.toFoodInfoDto(addedFood));
     }
 
     @GetMapping("foods/{foodId}")
     public ResponseEntity<FoodInfoDto> getFood(@PathVariable Long foodId) {
         Food food = foodService.getFood(foodId);
-        return ResponseEntity.ok(cvtToFoodInfoDto(food));
+        return ResponseEntity.ok(foodMapper.toFoodInfoDto(food));
     }
 
     /**
@@ -103,7 +105,7 @@ public class FoodController {
     @GetMapping("stores/{storeId}/foods")
     public ResponseEntity<List<FoodInfoDto>> getStoreFoods(@PathVariable Long storeId) {
         List<Food> foods = foodService.getStoreFoods(storeId);
-        List<FoodInfoDto> foodInfoDtoList = foods.stream().map(this::cvtToFoodInfoDto).toList();
+        List<FoodInfoDto> foodInfoDtoList = foods.stream().map(foodMapper::toFoodInfoDto).toList();
         return ResponseEntity.ok(foodInfoDtoList);
     }
 
@@ -115,11 +117,11 @@ public class FoodController {
             @SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID) Long memberId,
             @PathVariable Long foodId,
             @RequestBody FoodInfoRequestDto foodInfoRequestDto) {
-        Food newFoodInfo = cvtToFood(foodInfoRequestDto);
+        Food newFoodInfo = foodMapper.fromDto(foodInfoRequestDto);
         Long menuCategoryId = foodInfoRequestDto.getMenuCategoryId();
         List<Long> ingredientIds = foodInfoRequestDto.getIngredientIds();
         Food newFood = foodService.updateFood(memberId, foodId, newFoodInfo, menuCategoryId, ingredientIds);
-        return ResponseEntity.ok(cvtToFoodInfoDto(newFood));
+        return ResponseEntity.ok(foodMapper.toFoodInfoDto(newFood));
     }
 
     @DeleteMapping("foods/{foodId}")
@@ -127,49 +129,13 @@ public class FoodController {
             @SessionAttribute(name = SessionConstants.LOGIN_MEMBER_ID) Long memberId,
             @PathVariable Long foodId) {
         Food food = foodService.deleteFood(memberId, foodId);
-        return ResponseEntity.ok(cvtToFoodInfoDto(food));
+        return ResponseEntity.ok(foodMapper.toFoodInfoDto(food));
     }
 
     @GetMapping("foods/filter")
     public ResponseEntity<List<FoodInfoDto>> filterFoods(@RequestBody FoodFilter foodFilter) {
         List<Food> foods = foodService.filterFoods(foodFilter);
-        List<FoodInfoDto> foodInfoDtoList = foods.stream().map(this::cvtToFoodInfoDto).toList();
+        List<FoodInfoDto> foodInfoDtoList = foods.stream().map(foodMapper::toFoodInfoDto).toList();
         return ResponseEntity.ok(foodInfoDtoList);
-    }
-
-    public MenuCategoryInfoDto cvtToMenuCategoryInfoDto(MenuCategory menuCategory) {
-        MenuCategoryInfoDto menuCategoryInfoDto = new MenuCategoryInfoDto();
-        menuCategoryInfoDto.setMenuCategoryId(menuCategory.getMenuCategoryId());
-        menuCategoryInfoDto.setName(menuCategory.getName());
-        return menuCategoryInfoDto;
-    }
-
-    public IngredientInfoDto cvtToIngredientInfoDto(Ingredient ingredient) {
-        IngredientInfoDto ingredientInfoDto = new IngredientInfoDto();
-        ingredientInfoDto.setIngredientId(ingredient.getIngredientId());
-        ingredientInfoDto.setName(ingredient.getName());
-        return ingredientInfoDto;
-    }
-
-    public Food cvtToFood(FoodInfoRequestDto foodInfoRequestDto) {
-        Food food = new Food();
-        food.setName(foodInfoRequestDto.getName());
-        food.setPrice(foodInfoRequestDto.getPrice());
-        food.setDescription(foodInfoRequestDto.getDescription());
-        food.setMenuType(MenuType.from(foodInfoRequestDto.getMenuTypeValue()));
-        return food;
-    }
-
-    public FoodInfoDto cvtToFoodInfoDto(Food food) {
-        FoodInfoDto foodInfoDto = new FoodInfoDto();
-        foodInfoDto.setFoodId(food.getFoodId());
-        foodInfoDto.setStoreId(food.getStore().getStoreId());
-        foodInfoDto.setName(food.getName());
-        foodInfoDto.setPrice(food.getPrice());
-        foodInfoDto.setDescription(food.getDescription());
-        foodInfoDto.setMenuTypeValue(food.getMenuType().getValue());
-        foodInfoDto.setMenuCategory(food.getMenuCategory());
-        foodInfoDto.setIngredients(food.getIngredients());
-        return foodInfoDto;
     }
 }
