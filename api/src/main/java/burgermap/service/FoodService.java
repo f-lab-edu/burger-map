@@ -114,8 +114,13 @@ public class FoodService {
         return food;
     }
 
+    /**
+     * 주어진 카테고리, 재료를 만족하는 음식 조회
+     *
+     * @param foodFilter 카테고리, 재료 조건
+     */
     public List<Food> filterFoods(FoodFilter foodFilter) {
-        return foodRepository.filterFood(foodFilter);
+        return foodLookupService.filterFoods(foodFilter);
     }
 
 

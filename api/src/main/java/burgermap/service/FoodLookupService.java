@@ -1,5 +1,6 @@
 package burgermap.service;
 
+import burgermap.dto.food.FoodFilter;
 import burgermap.entity.Food;
 import burgermap.exception.food.FoodNotExistException;
 import burgermap.repository.FoodRepository;
@@ -30,5 +31,14 @@ public class FoodLookupService {
 
     List<Food> findByStoreId(Long storeId) {
         return repository.findByStoreId(storeId);
+    }
+
+    /**
+     * 주어진 카테고리, 재료를 만족하는 음식 조회
+     *
+     * @param foodFilter 카테고리, 재료 조건
+     */
+    List<Food> filterFoods(FoodFilter foodFilter) {
+        return repository.filterFood(foodFilter);
     }
 }

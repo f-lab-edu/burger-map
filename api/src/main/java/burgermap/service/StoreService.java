@@ -43,13 +43,14 @@ public class StoreService {
         return store;
     }
 
-    public List<Store> getStores(GeoLocationRange geoLocationRange) {
-        return storeRepository.findByGeoRange(
-                geoLocationRange.getMinLatitude(),
-                geoLocationRange.getMaxLatitude(),
-                geoLocationRange.getMinLongitude(),
-                geoLocationRange.getMaxLongitude()
-        );
+    /**
+     * 주어진 위경도 범위 내의 가게를 조회
+     *
+     * @param geoLocationRange 최소/최대 위경도를 포함하는 객체
+     * @return 주어진 범위 내의 가게 목록
+     */
+    public List<Store> getStoresWithinGeoRange(GeoLocationRange geoLocationRange) {
+        return storeLookupService.getStoresWithinGeoRange(geoLocationRange);
     }
 
     public List<Store> getMyStores(Long memberId) {
