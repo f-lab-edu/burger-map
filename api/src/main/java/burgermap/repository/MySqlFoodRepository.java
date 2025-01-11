@@ -62,11 +62,17 @@ public class MySqlFoodRepository implements FoodRepository{
      */
     @Override
     public List<Food> filterFood(FoodFilter foodFilter) {
+        List<Long> storeIds = foodFilter.getStoreIds();
         Long menuCategoryId = foodFilter.getMenuCategoryId();
         List<Long> ingredientIds = foodFilter.getIngredientIds();
 
         QFood food = QFood.food;
         BooleanBuilder builder = new BooleanBuilder();
+
+        // 제시된 가게들에서 판매하는 음식 필터링
+        if (storeIds != null && !storeIds.isEmpty()) {
+            builder.and(food.store.storeId.in(storeIds));
+        }
 
         // 카테고리 필터링 - 버거, 감자튀김, 하이볼, ...
         if (menuCategoryId != null) {

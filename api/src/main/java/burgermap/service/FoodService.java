@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class FoodService {
-    private final StoreService storeService;
     private final FoodLookupService foodLookupService;
     private final MemberLookupService memberLookupService;
     private final StoreLookupService storeLookupService;
@@ -47,14 +46,24 @@ public class FoodService {
     }
 
     @Transactional
-    public Food addFood(Food food, Long storeId, Long memberId) {
+    public Food addFood(Food food, Long menuCategoryId, List<Long> ingredientIds, Long storeId, Long memberId) {
         memberLookupService.isMemberTypeOwner(memberId);
         Store store = storeLookupService.findByStoreId(storeId);
         storeLookupService.checkStoreBelongTo(store, memberId);
 
+        // 카테고리와 재료 조회 후 음식 엔티티에 주입
+        setFoodAttributes(food, menuCategoryId, ingredientIds);
         food.setStore(store);
 
         return foodRepository.save(food);
+    }
+
+    /**
+     * 음식 엔티티에 카테고리와 재료 주입
+     */
+    public void setFoodAttributes(Food food, Long menuCategoryId, List<Long> ingredientIds) {
+        food.setMenuCategory(menuCategoryIdToMenuCategory(menuCategoryId));
+        food.setIngredients(ingredientIdsToIngredients(ingredientIds));
     }
 
     public Food getFood(Long foodId) {
@@ -78,10 +87,14 @@ public class FoodService {
      * 요청 회원이 음식이 등록된 가게의 소유자 여부 확인, 음식 엔티티 수정
      */
     @Transactional
-    public Food updateFood(Long requestMemberId, Long foodId, Food newFoodInfo) {
+    public Food updateFood(Long requestMemberId, Long foodId, Food newFoodInfo, Long menuCategoryId, List<Long> ingredientIds) {
         Food food = foodLookupService.findByFoodId(foodId);
         storeLookupService.checkStoreBelongTo(food.getStore(), requestMemberId);
 
+        // 카테고리와 재료 주입
+        setFoodAttributes(newFoodInfo, menuCategoryId, ingredientIds);
+
+        // 엔티티 정보 수정
         food.setName(newFoodInfo.getName());
         food.setPrice(newFoodInfo.getPrice());
         food.setDescription(newFoodInfo.getDescription());
@@ -101,8 +114,13 @@ public class FoodService {
         return food;
     }
 
+    /**
+     * 주어진 카테고리, 재료를 만족하는 음식 조회
+     *
+     * @param foodFilter 카테고리, 재료 조건
+     */
     public List<Food> filterFoods(FoodFilter foodFilter) {
-        return foodRepository.filterFood(foodFilter);
+        return foodLookupService.filterFoods(foodFilter);
     }
 
 

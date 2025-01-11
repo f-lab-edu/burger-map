@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,4 +31,13 @@ public class Member {
     private String nickname;
     @OneToOne(optional = true, cascade = CascadeType.ALL)  // Image 엔티티의 persist 관리가 구현되지 않아 CascadeType.ALL 추가
     private Image profileImage;
+
+    @Builder
+    public Member(MemberType memberType, String loginId, String password, String email, String nickname) {
+        this.memberType = memberType;
+        this.loginId = loginId;
+        this.password = password;
+        this.email = email;
+        this.nickname = nickname;
+    }
 }
