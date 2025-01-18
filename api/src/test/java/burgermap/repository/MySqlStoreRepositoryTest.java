@@ -3,23 +3,25 @@ package burgermap.repository;
 import burgermap.entity.Member;
 import burgermap.entity.Store;
 import burgermap.enums.MemberType;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
+@Import(MySqlStoreRepository.class)
 class MySqlStoreRepositoryTest extends TestcontainersTest {
 
     @Autowired
     private StoreRepository storeRepository;
 
     @Autowired
-    private EntityManager entityManager;
+    private TestEntityManager entityManager;
 
     @Test
     @DisplayName("가게 추가 및 가게 번호 조회")
