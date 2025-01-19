@@ -1,6 +1,7 @@
 package burgermap.service.geoCoding;
 
 import burgermap.dto.geo.GeoLocation;
+import burgermap.exception.geoCoding.InvalidAddressException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,10 @@ public class GeoCodingService {
         if (parsedResponse.isEmpty()) {
             return Optional.empty();
         }
+
+        if (((List) parsedResponse.get("addresses")).isEmpty())
+            throw new InvalidAddressException(address);
+
         Map<String, Object> addressInfo = getFirstAddressInfo(parsedResponse);
         return Optional.of(
                 new GeoLocation(
