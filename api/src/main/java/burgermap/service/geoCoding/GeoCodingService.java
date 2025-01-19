@@ -1,12 +1,10 @@
-package burgermap.service;
+package burgermap.service.geoCoding;
 
 import burgermap.dto.geo.GeoLocation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,11 +13,8 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-class GeoCodingService {
-    @Value("${cloud.ncp.maps.geocoding.client-id}")
-    private String mapsClientId;
-    @Value("${cloud.ncp.maps.geocoding.client-secret}")
-    private String mapsClientSecret;
+public class GeoCodingService {
+    private final GeoCodingClient geoCodingClient;
 
     /**
      * 주소를 입력받아 해당 주소의 위도, 경도 정보를 반환
@@ -27,20 +22,8 @@ class GeoCodingService {
      * @param address 주소
      * @return 주소의 위도, 경도 정보
      */
-    Optional<GeoLocation> getGeoLocation(String address) {
-        WebClient webClient = WebClient.builder().baseUrl("https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode")
-                .defaultHeader("x-ncp-apigw-api-key-id", mapsClientId)
-                .defaultHeader("x-ncp-apigw-api-key", mapsClientSecret)
-                .build();
-
-        String response = webClient.get()
-                .uri(uriBuilder ->
-                        uriBuilder
-                                .queryParam("query", address)
-                                .build())
-                .retrieve()
-                .bodyToMono(String.class)  // JSON 형식의 응답을 String으로 변환
-                .block();
+    public Optional<GeoLocation> getGeoLocation(String address) {
+        String response = geoCodingClient.request(address);
 
         Map<String, Object> parsedResponse = parseResponse(response);
         if (parsedResponse.isEmpty()) {
