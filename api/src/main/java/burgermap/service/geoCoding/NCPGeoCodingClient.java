@@ -8,7 +8,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @ConfigurationProperties(prefix = "cloud.ncp.maps.geocoding")
 @Component
-public class NCPGeoCodingClient implements GeoCodingClient {
+public class NCPGeoCodingClient {
+    @Setter
+    private String baseUrl;
     @Setter
     private String clientId;
     @Setter
@@ -18,14 +20,12 @@ public class NCPGeoCodingClient implements GeoCodingClient {
 
     @PostConstruct
     void init() {
-        System.out.println("clientId = " + clientId);
-        this.webClient = WebClient.builder().baseUrl("https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode")
+        this.webClient = WebClient.builder().baseUrl(baseUrl)
                 .defaultHeader("x-ncp-apigw-api-key-id", clientId)
                 .defaultHeader("x-ncp-apigw-api-key", clientSecret)
                 .build();
     }
 
-    @Override
     public String request(String address) {
         return webClient.get()
                 .uri(uriBuilder ->

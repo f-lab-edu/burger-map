@@ -15,7 +15,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class GeoCodingService {
-    private final GeoCodingClient geoCodingClient;
+    private final NCPGeoCodingClient geoCodingClient;
 
     /**
      * 주소를 입력받아 해당 주소의 위도, 경도 정보를 반환

@@ -21,7 +21,7 @@ class GeoCodingServiceTest {
     private GeoCodingService geoCodingService;
 
     @Mock
-    private GeoCodingClient geoCodingclient;
+    private NCPGeoCodingClient geoCodingClient;
 
     @Test
     @DisplayName("정확한 주소를 입력하여 받은 응답을 파싱하여 위경도 정보 획득")
@@ -29,7 +29,7 @@ class GeoCodingServiceTest {
         // given
         String address = "정확한 주소";
         String response = "{\"status\":\"OK\",\"meta\":{\"totalCount\":1,\"page\":1,\"count\":1},\"addresses\":[{\"roadAddress\":\"서울특별시 중구 명동7길 8\",\"jibunAddress\":\"서울특별시 중구 명동1가 48-2\",\"englishAddress\":\"8, Myeongdong 7-gil, Jung-gu, Seoul, Republic of Korea\",\"addressElements\":[{\"types\":[\"SIDO\"],\"longName\":\"서울특별시\",\"shortName\":\"서울특별시\",\"code\":\"\"},{\"types\":[\"SIGUGUN\"],\"longName\":\"중구\",\"shortName\":\"중구\",\"code\":\"\"},{\"types\":[\"DONGMYUN\"],\"longName\":\"명동1가\",\"shortName\":\"명동1가\",\"code\":\"\"},{\"types\":[\"RI\"],\"longName\":\"\",\"shortName\":\"\",\"code\":\"\"},{\"types\":[\"ROAD_NAME\"],\"longName\":\"명동7길\",\"shortName\":\"명동7길\",\"code\":\"\"},{\"types\":[\"BUILDING_NUMBER\"],\"longName\":\"8\",\"shortName\":\"8\",\"code\":\"\"},{\"types\":[\"BUILDING_NAME\"],\"longName\":\"\",\"shortName\":\"\",\"code\":\"\"},{\"types\":[\"LAND_NUMBER\"],\"longName\":\"48-2\",\"shortName\":\"48-2\",\"code\":\"\"},{\"types\":[\"POSTAL_CODE\"],\"longName\":\"04534\",\"shortName\":\"04534\",\"code\":\"\"}],\"x\":\"126.9847333\",\"y\":\"37.5642362\",\"distance\":0.0}],\"errorMessage\":\"\"}";
-        Mockito.when(geoCodingclient.request(address))
+        Mockito.when(geoCodingClient.request(address))
                 .thenAnswer(invocation -> response);
 
         // when
@@ -47,7 +47,7 @@ class GeoCodingServiceTest {
         // given
         String address = "잘못된 주소";
         String response = "{\"status\":\"OK\",\"meta\":{\"totalCount\":0,\"count\":0},\"addresses\":[],\"errorMessage\":\"\"}";
-        Mockito.when(geoCodingclient.request(address))
+        Mockito.when(geoCodingClient.request(address))
                 .thenAnswer(invocation -> response);
 
         // when
@@ -62,7 +62,7 @@ class GeoCodingServiceTest {
         // given
         String address = "부정확한 주소";
         String response = "{\"status\":\"OK\",\"meta\":{\"totalCount\":2,\"page\":1,\"count\":2},\"addresses\":[{\"roadAddress\":\"서울특별시 중구 명동7길 8\",\"jibunAddress\":\"서울특별시 중구 명동1가 48-2\",\"englishAddress\":\"8, Myeongdong 7-gil, Jung-gu, Seoul, Republic of Korea\",\"addressElements\":[{\"types\":[\"SIDO\"],\"longName\":\"서울특별시\",\"shortName\":\"서울특별시\",\"code\":\"\"},{\"types\":[\"SIGUGUN\"],\"longName\":\"중구\",\"shortName\":\"중구\",\"code\":\"\"},{\"types\":[\"DONGMYUN\"],\"longName\":\"명동1가\",\"shortName\":\"명동1가\",\"code\":\"\"},{\"types\":[\"RI\"],\"longName\":\"\",\"shortName\":\"\",\"code\":\"\"},{\"types\":[\"ROAD_NAME\"],\"longName\":\"명동7길\",\"shortName\":\"명동7길\",\"code\":\"\"},{\"types\":[\"BUILDING_NUMBER\"],\"longName\":\"8\",\"shortName\":\"8\",\"code\":\"\"},{\"types\":[\"BUILDING_NAME\"],\"longName\":\"\",\"shortName\":\"\",\"code\":\"\"},{\"types\":[\"LAND_NUMBER\"],\"longName\":\"48-2\",\"shortName\":\"48-2\",\"code\":\"\"},{\"types\":[\"POSTAL_CODE\"],\"longName\":\"04534\",\"shortName\":\"04534\",\"code\":\"\"}],\"x\":\"126.9847333\",\"y\":\"37.5642362\",\"distance\":0.0},{\"roadAddress\":\"서울특별시 중구 명동7길 12\",\"jibunAddress\":\"서울특별시 중구 명동1가 47-1\",\"englishAddress\":\"12, Myeongdong 7-gil, Jung-gu, Seoul, Republic of Korea\",\"addressElements\":[{\"types\":[\"SIDO\"],\"longName\":\"서울특별시\",\"shortName\":\"서울특별시\",\"code\":\"\"},{\"types\":[\"SIGUGUN\"],\"longName\":\"중구\",\"shortName\":\"중구\",\"code\":\"\"},{\"types\":[\"DONGMYUN\"],\"longName\":\"명동1가\",\"shortName\":\"명동1가\",\"code\":\"\"},{\"types\":[\"RI\"],\"longName\":\"\",\"shortName\":\"\",\"code\":\"\"},{\"types\":[\"ROAD_NAME\"],\"longName\":\"명동7길\",\"shortName\":\"명동7길\",\"code\":\"\"},{\"types\":[\"BUILDING_NUMBER\"],\"longName\":\"12\",\"shortName\":\"12\",\"code\":\"\"},{\"types\":[\"BUILDING_NAME\"],\"longName\":\"\",\"shortName\":\"\",\"code\":\"\"},{\"types\":[\"LAND_NUMBER\"],\"longName\":\"47-1\",\"shortName\":\"47-1\",\"code\":\"\"},{\"types\":[\"POSTAL_CODE\"],\"longName\":\"04534\",\"shortName\":\"04534\",\"code\":\"\"}],\"x\":\"126.9845564\",\"y\":\"37.5643194\",\"distance\":0.0}],\"errorMessage\":\"\"}";
-        Mockito.when(geoCodingclient.request(address))
+        Mockito.when(geoCodingClient.request(address))
                 .thenAnswer(invocation -> response);
 
         // when
