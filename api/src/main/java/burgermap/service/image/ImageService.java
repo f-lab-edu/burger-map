@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ImageService {
 
-    private final ImageUploadURLPresigner presigner;
+    private final ImageUploadUrlPresigner presigner;
     private final ImageNameGenerator imageNameGenerator;
 
     /**

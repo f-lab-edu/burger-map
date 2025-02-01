@@ -1,7 +1,6 @@
 package burgermap.service.image;
 
 import burgermap.dto.image.ImageUploadUrlDto;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +21,7 @@ class ImageServiceTest {
     @InjectMocks
     private ImageService imageService;
     @Mock
-    private ImageUploadURLPresigner presigner;
+    private ImageUploadUrlPresigner presigner;
     @Mock
     private ImageNameGenerator imageNameGenerator;
 

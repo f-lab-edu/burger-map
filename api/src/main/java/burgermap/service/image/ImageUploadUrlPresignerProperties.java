@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @Getter
 @RequiredArgsConstructor
-class ImageUploadURLPresignerProperties {
+class ImageUploadUrlPresignerProperties {
     private final String region;
     private final String endpoint;
     private final String bucket;

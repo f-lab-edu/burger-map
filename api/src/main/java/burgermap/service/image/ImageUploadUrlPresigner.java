@@ -15,7 +15,7 @@ import java.net.URI;
 import java.time.Duration;
 
 @Component
-class ImageUploadURLPresigner {
+class ImageUploadUrlPresigner {
     @Getter
     private final String endpoint;
     @Getter
@@ -23,7 +23,7 @@ class ImageUploadURLPresigner {
 
     private final S3Presigner s3Presigner;
 
-    public ImageUploadURLPresigner(ImageUploadURLPresignerProperties properties) {
+    public ImageUploadUrlPresigner(ImageUploadUrlPresignerProperties properties) {
         this.endpoint = properties.getEndpoint();
         this.bucket = properties.getBucket();
 
