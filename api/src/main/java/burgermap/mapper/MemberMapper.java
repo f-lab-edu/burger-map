@@ -4,7 +4,7 @@ import burgermap.dto.member.MemberInfoDto;
 import burgermap.dto.member.MemberJoinRequestDto;
 import burgermap.dto.member.MemberJoinResponseDto;
 import burgermap.entity.Member;
-import burgermap.service.ImageService;
+import burgermap.service.image.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

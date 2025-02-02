@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class SearchService {
 
     private final StoreLookupService storeLookupService;
-    private final FoodLookupService foodLookupService;
+    private final FoodService foodService;
 
     /*
      * 음식 필터를 만족하는 음식을 판매하며, 주어진 위경도 범위를 만족하는 가게를 조회
@@ -37,7 +37,7 @@ public class SearchService {
             foodFilter.setStoreIds(storeIds);
 
             // 음식 필터를 만족하는 음식을 조회하고 해당 음식을 판매하는 가게만 필터링
-            foods.addAll(foodLookupService.filterFoods(foodFilter));
+            foods.addAll(foodService.filterFoods(foodFilter));
             List<Long> filteredStoreIds = foods.stream().map(food -> food.getStore().getStoreId()).distinct().toList();
             stores.removeIf(store -> !filteredStoreIds.contains(store.getStoreId()));
         }

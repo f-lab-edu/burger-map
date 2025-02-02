@@ -5,6 +5,7 @@ import burgermap.dto.geo.GeoLocationRange;
 import burgermap.entity.Member;
 import burgermap.entity.Store;
 import burgermap.repository.StoreRepository;
+import burgermap.service.geoCoding.GeoCodingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
