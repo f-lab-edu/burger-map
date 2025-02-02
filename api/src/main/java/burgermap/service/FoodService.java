@@ -120,7 +120,7 @@ public class FoodService {
      * @param foodFilter 카테고리, 재료 조건
      */
     public List<Food> filterFoods(FoodFilter foodFilter) {
-        return foodLookupService.filterFoods(foodFilter);
+        return foodRepository.filterFood(foodFilter);
     }
 
 
